@@ -1,2 +1,6 @@
+import entrance_hall
+import outside
+
+
 def start(game):
-    pass
+    return outside.outside.run_scene(game)

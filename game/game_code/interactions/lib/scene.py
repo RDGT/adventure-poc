@@ -25,6 +25,7 @@ class Scene(object):
         self.options[key] = destination
 
     def run_scene(self, game):
+        # todo: add documentation @inbar
         game.interface.display('==[ {} ]=='.format(self.name))
         game.interface.display(self.opening_text)
         if self.prompt and self.options:

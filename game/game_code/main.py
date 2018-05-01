@@ -27,4 +27,5 @@ def start_game(*args):
     game = Game()
     game.add_player()
     game.set_interface(terminal_interface.TerminalInterface())
-    levels.test_level.start(game)
+    levels.level_1.start(game)
+    # levels.test_level.start(game)
