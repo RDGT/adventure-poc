@@ -1,3 +1,6 @@
+import imp
+from game_code.core import *
+
 class Scene(object):
 
     def __init__(self, name, opening_text, prompt=None, options=None, **kwargs):
@@ -9,6 +12,7 @@ class Scene(object):
         :param options: a dictionary, of choices {'string_choice': next_scene_object}
         :param kwargs: kwargs to send the "prompt for choice" method
         """
+        prompt = prompt or 'What do you do?'
         self.name = name
         self.opening_text = opening_text
         self.prompt = prompt
@@ -30,6 +34,31 @@ class Scene(object):
         game.interface.display(self.opening_text)
         if self.prompt and self.options:
             choice = game.interface.prompt_for_choice(self.prompt, self.options.keys(), **self.kwargs)
-            next_scene = self.options[choice]
+            next_scene = self.get_scene(self.options[choice])
             assert isinstance(next_scene, Scene)
             return next_scene.run_scene(game)
+
+    def get_scene(self, scene):
+        if isinstance(scene, Scene):
+            return scene
+        else:
+            return scene_loader(scene)
+
+
+def scene_loader(path, root=None):
+    """
+    loads a scene from its string path relative to root
+    :param path: the . seperated path of the scene to load
+    :param root: the root of the dir to load, defaults to levels dir
+    :return:
+    """
+    root = root or levels_dir
+    # format names
+    path_sections = path.split('.')
+    scene_name = path_sections.pop(-1)
+    lib_name = path_sections[-1]
+    library_path = '{}.py'.format(os.path.join(root, *path_sections))
+    # load module
+    module = imp.load_source(lib_name, library_path)
+    return getattr(module, scene_name)
+
