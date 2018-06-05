@@ -34,7 +34,7 @@ grande_hall2 = interactions.room.Room(
     opening_text='looking around',
     options={
         'Left Room': 'level_2.dining_room.dining_room1',
-        'Far Left Room': 'level_2.grande_hall.fight',
+        'Far Left Room': 'level_2.laboratory.laboratory',
         'Right Room': 'level_2.library.library',
         'Far Right Room': 'level_2.grande_hall.fight',
     }
