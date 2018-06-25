@@ -5,7 +5,7 @@ iron_gate2 = interactions.scene.Scene(
     name='Iron Gate',
     opening_text='The key fits and the gate swings open, the sound of its rusty hinges echos down the stairs',
     options={
-        'Advance down the stairs': 'level_2.entrance_hall.entrance_hall',
+        'Advance down the stairs': 'level_2.grande_hall.grande_hall1',
         'Go back to the entrance hall': 'level_1.entrance_hall.entrance_hall',
     }
 )
