@@ -2,6 +2,8 @@ import room
 import puzzle
 import dialogue
 import combat
+import level
+import thing
 from lib import scene
 
 # some constant scenes (mostly for testing)

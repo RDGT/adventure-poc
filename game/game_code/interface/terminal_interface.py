@@ -34,6 +34,10 @@ class TerminalInterface(abstract_interface.Interface):
             choice_display = '\n'.join(['- {}'.format(k) for k in choice_map.keys()])
         return choice_map, choice_display
 
+    def display_screen(self, screen):
+        self.display('==[ {} ]=='.format(screen.title))
+        self.display(screen.text)
+
     @staticmethod
     def display(text):
         print text

@@ -1,5 +1,34 @@
-import imp
-from game_code.core import *
+import os
+from game_code import core
+
+
+class Screen(object):
+    """
+    a screen is the smallest instance of the game. the game is comprised of screens.
+    a scene can have multiple screens. and a room may have multiple scenes, while a level has multiple rooms.
+    scenes could be a puzzle, dialogue, combat, or a thing.
+    """
+
+    def __init__(self, title, text, prompt=None, choices=None, **kwargs):
+        self.title = title
+        self.text = text
+        self.prompt = prompt or 'What do you do?'
+        self.choices = choices
+        self.kwargs = kwargs
+        # choice holder
+        self.choice = None
+        # game holder
+        self.game = None
+
+    def attach_game(self, game):
+        self.game = game
+
+    def update_choice(self, choice):
+        self.choice = choice
+
+    def do_screen(self):
+        self.game.do_screen(self)
+
 
 class Scene(object):
 
@@ -18,7 +47,12 @@ class Scene(object):
         self.prompt = prompt
         self.options = options or {}
         self.kwargs = kwargs
+        # game holder
+        self.game = None
         super(Scene, self).__init__()
+
+    def attach_game(self, game):
+        self.game = game
 
     def set_options(self, options):
         """set options on a scene"""
@@ -52,13 +86,11 @@ def scene_loader(path, root=None):
     :param root: the root of the dir to load, defaults to levels dir
     :return:
     """
-    root = root or levels_dir
+    root = root or core.levels_dir
     # format names
     path_sections = path.split('.')
     scene_name = path_sections.pop(-1)
-    lib_name = path_sections[-1]
     library_path = '{}.py'.format(os.path.join(root, *path_sections))
-    # load module
-    module = imp.load_source(lib_name, library_path)
-    return getattr(module, scene_name)
+    # load scene
+    return core.load_class_from_file(library_path, scene_name)
 

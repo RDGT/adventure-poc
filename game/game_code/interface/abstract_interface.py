@@ -58,6 +58,9 @@ class Interface(object):
     def get_next_prompt_id(self):
         return self.promp_id.next()
 
+    def display_screen(self, screen):
+        raise NotImplementedError()
+
     @staticmethod
     def display(text):
         raise NotImplementedError()
