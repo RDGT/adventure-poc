@@ -22,11 +22,26 @@ class Game(object):
         self.levels = []
         # operation
         self.operating = False
-        # navigation
+        # navigation | screen
         self.screen_history = []
         self.next_screen = None
         self.current_screen = None
         self.previous_screen = None
+        # navigation | scenes
+        self.scene_history = []
+        self.next_scene = None
+        self.current_scene = None
+        self.previous_scene = None
+        # navigation | rooms
+        self.room_history = []
+        self.next_room = None
+        self.current_room = None
+        self.previous_room = None
+        # navigation | level
+        self.level_history = []
+        self.next_level = None
+        self.current_level = None
+        self.previous_level = None
         super(Game, self).__init__()
 
     def add_player(self):
