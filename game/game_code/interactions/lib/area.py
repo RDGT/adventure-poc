@@ -1,3 +1,4 @@
+
 class Area(object):
     def __init__(self):
         # game holder

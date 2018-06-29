@@ -7,7 +7,10 @@ class Choice(object):
     the simplest choice type simply returns to the previous scene
     another common choice type navigates to a new scene.
     """
-    pass
+
+    def __init__(self, text):
+        self.text = text
+        super(Choice, self).__init__()
 
 
 class ChoiceBack(Choice):
@@ -22,6 +25,6 @@ class ChoiceNext(Choice):
 
 class ChoiceNavigate(Choice):
     """navigate to a new scene (screen?)"""
-    def __init__(self, target_scene):
+    def __init__(self, text, target_scene):
         self.target_scene = target_scene
-        super(ChoiceNavigate, self).__init__()
+        super(ChoiceNavigate, self).__init__(text)

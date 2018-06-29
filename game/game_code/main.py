@@ -98,6 +98,7 @@ class Game(object):
     def add_new_level(self, level_class):
         level = level_class()
         level.attach_game(self)
+        level.load_rooms()
         self.levels.append(level)
 
     def set_first_screen(self):

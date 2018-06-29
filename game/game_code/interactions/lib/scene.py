@@ -43,34 +43,28 @@ class Scene(object):
         """
         prompt = prompt or 'What do you do?'
         self.name = name
-        self.opening_text = opening_text
-        self.prompt = prompt
-        self.options = options or {}
         self.kwargs = kwargs
         # game holder
         self.game = None
+        self.screens = {}
+        # add scene intro screen
+        self.add_screen('intro', Screen(self.name, opening_text, prompt, options))
+        # location in scene (start at intro)
+        self.scene_location = 'intro'
         super(Scene, self).__init__()
+
+    def add_screen(self, screen_key, screen_instance):
+        screen_instance.attach_game(self.game)
+        self.screens[screen_key] = screen_instance
 
     def attach_game(self, game):
         self.game = game
 
-    def set_options(self, options):
-        """set options on a scene"""
-        for key, value in options.items():
-            self.set_option(key, value)
-
-    def set_option(self, key, destination):
-        self.options[key] = destination
-
-    def run_scene(self, game):
+    def run_scene(self, *args, **kwargs):
         # todo: add documentation @inbar
-        game.interface.display('==[ {} ]=='.format(self.name))
-        game.interface.display(self.opening_text)
-        if self.prompt and self.options:
-            choice = game.interface.prompt_for_choice(self.prompt, self.options.keys(), **self.kwargs)
-            next_scene = self.get_scene(self.options[choice])
-            assert isinstance(next_scene, Scene)
-            return next_scene.run_scene(game)
+        # start with intro screen
+        screen = self.screens[self.scene_location]
+        self.game.do_screen(screen)
 
     def get_scene(self, scene):
         if isinstance(scene, Scene):
