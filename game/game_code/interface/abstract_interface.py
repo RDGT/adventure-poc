@@ -28,6 +28,7 @@ class Decision(object):
             self.prompt_for_choice()
             if self.choice:
                 return self.choice
+            log.debug('no valid choice selected yet')
             self.show_choices()
 
     def initial_display(self):
@@ -51,8 +52,9 @@ class Interface(object):
 
     decision_class = Decision
 
-    def __init__(self):
+    def __init__(self, menu_choices=None):
         self.promp_id = itertools.count()
+        self.menu_choices = menu_choices
         super(Interface, self).__init__()
 
     def get_next_prompt_id(self):

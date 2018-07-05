@@ -7,9 +7,9 @@ log = logging.getLogger('interface.terminal')
 class TerminalDecision(abstract_interface.Decision):
 
     def __init__(self, interface, decision_id, prompt, choices, **kwargs):
-        choice_map, choice_display = interface.format_choices(choices, kwargs.get('by_index', True))
+        choice_map, choice_display = interface.format_choices(choices, kwargs.get('add_menu_choices', True))
         self.choice_map = choice_map
-        self.valid_choices = choice_map.keys() + choice_map.values()
+        self.valid_choices = choice_map.keys()
         self.choice_display = choice_display
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
 
@@ -24,15 +24,29 @@ class TerminalInterface(abstract_interface.Interface):
     not_a_valid_choice_msg = 'Error: This is not a valid choice, choose again!'
     please_select_a_choice_msg = 'please select one of the choices:'
 
-    @staticmethod
-    def format_choices(choices, by_index=True):
-        if by_index:
-            choice_map = {str(i): c for i, c in enumerate(choices, start=1)}
-            choice_display = '\n'.join(['- {}: {}'.format(k, v) for k, v in sorted(choice_map.items())])
-        else:
-            choice_map = {c: c for c in choices}
-            choice_display = '\n'.join(['- {}'.format(k) for k in choice_map.keys()])
+    def format_choices(self, choices, add_menu_choices=True):
+        index = 1
+        choice_map = {}
+        choice_display_lines = []
+        for choice in choices:
+            if choice.key:
+                key = str(choice.key)
+            else:
+                key = str(index)
+                index += 1
+            choice_map[key] = choice
+            choice_display_lines.append(' - [{}] : {}'.format(key, choice.text))
+        if add_menu_choices and self.menu_choices:
+            choice_map.update({c.key: c.text for c in self.menu_choices})
+            choice_display_lines.extend(self.menu_choices_display)
+        choice_display = '\n'.join(choice_display_lines)
         return choice_map, choice_display
+
+    def __init__(self, menu_choices=None):
+        if menu_choices:
+            self.menu_choices_display = ['Menu Choices: {}'.format(
+                ', '.join(['[{}] {}'.format(c.key, c.text) for c in menu_choices]))]
+        super(TerminalInterface, self).__init__(menu_choices)
 
     def display_screen(self, screen):
         self.display('==[ {} ]=='.format(screen.title))

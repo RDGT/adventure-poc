@@ -9,11 +9,12 @@ class Screen(object):
     scenes could be a puzzle, dialogue, combat, or a thing.
     """
 
-    def __init__(self, title, text, prompt=None, choices=None, **kwargs):
+    def __init__(self, title, text, prompt=None, choices=None, events=None, **kwargs):
         self.title = title
         self.text = text
         self.prompt = prompt or 'What do you do?'
         self.choices = choices
+        self.events = events
         self.kwargs = kwargs
         # choice holder
         self.choice = None
@@ -27,12 +28,12 @@ class Screen(object):
         self.choice = choice
 
     def do_screen(self):
-        self.game.do_screen(self)
+        self.game.do_scene(self)
 
 
 class Scene(object):
 
-    def __init__(self, name, opening_text, prompt=None, options=None, **kwargs):
+    def __init__(self, name, opening_text, prompt=None, choices=None, events=None, **kwargs):
         """
         Creates a new scene to be used in the Adventure
         :param name: the name of the scene
@@ -48,9 +49,9 @@ class Scene(object):
         self.game = None
         self.screens = {}
         # add scene intro screen
-        self.add_screen('intro', Screen(self.name, opening_text, prompt, options))
+        self.add_screen('intro', Screen(self.name, opening_text, prompt, choices, events))
         # location in scene (start at intro)
-        self.scene_location = 'intro'
+        self.current_screen = 'intro'
         super(Scene, self).__init__()
 
     def add_screen(self, screen_key, screen_instance):
@@ -60,17 +61,11 @@ class Scene(object):
     def attach_game(self, game):
         self.game = game
 
-    def run_scene(self, *args, **kwargs):
-        # todo: add documentation @inbar
-        # start with intro screen
-        screen = self.screens[self.scene_location]
-        self.game.do_screen(screen)
+    def get_first_screen(self):
+        return self.screens['intro']
 
-    def get_scene(self, scene):
-        if isinstance(scene, Scene):
-            return scene
-        else:
-            return scene_loader(scene)
+    def get_current_screen(self):
+        return self.screens[self.current_screen]
 
 
 def scene_loader(path, root=None):

@@ -8,6 +8,10 @@ class GameLoadClassException(GameRunTimeException):
     pass
 
 
+class GameNavigateFailure(GameRunTimeException):
+    pass
+
+
 class GameLibraryDoesNotExist(GameLoadClassException):
     pass
 
