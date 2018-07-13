@@ -63,6 +63,9 @@ class Interface(object):
     def display_screen(self, screen):
         raise NotImplementedError()
 
+    def display_menu(self, menu):
+        raise NotImplementedError()
+
     @staticmethod
     def display(text):
         raise NotImplementedError()

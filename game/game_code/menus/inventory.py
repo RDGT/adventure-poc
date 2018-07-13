@@ -5,8 +5,13 @@ class Inventory(menu.Menu):
 
     def __init__(self):
         self.items = []
-        super(Inventory, self).__init__()
+        super(Inventory, self).__init__('Inventory')
 
-    def add_item(self, item):
-        self.game.interface.display('Added {} to your inventory'.format(item.name))
+    @property
+    def menu_items(self):
+        return self.items
+
+    def add_item(self, item, display=True):
+        if display:
+            self.game.interface.display('Added an item to your Inventory: {}'.format(item.name))
         self.items.append(item)

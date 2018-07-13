@@ -1,23 +1,3 @@
-class ChoiceCondition(object):
-    """A choice condition is a condition which enabled or disables a choice"""
-    pass
-
-
-class ConditionEnable(ChoiceCondition):
-    """A condition which will enable the choice"""
-    pass
-
-
-class ConditionDisable(ChoiceCondition):
-    """A condition which will enable the choice"""
-    pass
-
-
-class OnlyOnce(ConditionDisable):
-    """a condition which will disable the condition once it has been selected once"""
-    pass
-
-
 class Choice(object):
     """
     a choice is how the game navigates, a choice will have a key that is held on it's screen, or elsewhere
@@ -52,6 +32,19 @@ class ChoiceNext(Choice):
     """go to next screen (for dialogue/long text)"""
     def __init__(self, text='Next', **kwargs):
         super(ChoiceNext, self).__init__(text, **kwargs)
+
+
+class ChoiceMenuItem(Choice):
+    """view item in menu"""
+    def __init__(self, menu_item, **kwargs):
+        self.menu_item = menu_item
+        super(ChoiceMenuItem, self).__init__(text=menu_item.title, **kwargs)
+
+
+class ChoiceExitMenu(Choice):
+    """exists the current menu"""
+    def __init__(self, text='Exit Menu', **kwargs):
+        super(ChoiceExitMenu, self).__init__(text, key='X', **kwargs)
 
 
 class ChoiceJournal(Choice):

@@ -1,5 +1,7 @@
 import abstract_interface
 import logging
+import game_code.interactions.lib.choices
+from game_code.core import exceptions
 
 log = logging.getLogger('interface.terminal')
 
@@ -7,14 +9,26 @@ log = logging.getLogger('interface.terminal')
 class TerminalDecision(abstract_interface.Decision):
 
     def __init__(self, interface, decision_id, prompt, choices, **kwargs):
-        choice_map, choice_display = interface.format_choices(choices, kwargs.get('add_menu_choices', True))
+        choice_map, choice_display = interface.format_choices(
+            choices,
+            kwargs.get('add_menu_choices', True),
+            kwargs.get('add_menu_exit', False),
+        )
         self.choice_map = choice_map
         self.valid_choices = choice_map.keys()
         self.choice_display = choice_display
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
 
     def set_choice(self, choice):
-        self.choice = self.choice_map.get(choice, choice)
+        choice_obj = self.choice_map.get(choice, None)
+        if choice_obj is None and choice.isalpha():
+            if choice.isupper():
+                choice_obj = self.choice_map.get(choice.lower(), None)
+            else:
+                choice_obj = self.choice_map.get(choice.upper(), None)
+        if choice_obj is None:
+            raise exceptions.GameInvalidChoice(choice)
+        self.choice = choice_obj
 
 
 class TerminalInterface(abstract_interface.Interface):
@@ -24,7 +38,7 @@ class TerminalInterface(abstract_interface.Interface):
     not_a_valid_choice_msg = 'Error: This is not a valid choice, choose again!'
     please_select_a_choice_msg = 'please select one of the choices:'
 
-    def format_choices(self, choices, add_menu_choices=True):
+    def format_choices(self, choices, add_menu_choices=True, add_menu_exit=False):
         index = 1
         choice_map = {}
         choice_display_lines = []
@@ -37,8 +51,11 @@ class TerminalInterface(abstract_interface.Interface):
             choice_map[key] = choice
             choice_display_lines.append(' - [{}] : {}'.format(key, choice.text))
         if add_menu_choices and self.menu_choices:
-            choice_map.update({c.key: c.text for c in self.menu_choices})
+            choice_map.update({c.key: c for c in self.menu_choices})
             choice_display_lines.extend(self.menu_choices_display)
+        elif isinstance(add_menu_exit, game_code.interactions.lib.choices.ChoiceExitMenu):
+            choice_map.update({add_menu_exit.key: add_menu_exit})
+            choice_display_lines.append(add_menu_exit.text)
         choice_display = '\n'.join(choice_display_lines)
         return choice_map, choice_display
 
@@ -76,4 +93,13 @@ class TerminalInterface(abstract_interface.Interface):
 
     def is_valid_choice(self, decision, choice):
         assert isinstance(decision, TerminalDecision)
-        return bool(choice in decision.valid_choices)
+        valid = bool(choice in decision.valid_choices)
+        if valid:
+            return True
+        elif choice.isalpha():
+            if choice.isupper():
+                return bool(choice.lower() in decision.valid_choices)
+            else:
+                return bool(choice.upper() in decision.valid_choices)
+        else:
+            return False

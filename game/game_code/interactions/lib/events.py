@@ -14,3 +14,10 @@ class AddItem(Event):
         self.item = item
         super(AddItem, self).__init__(**kwargs)
 
+
+class UnlockJournal(Event):
+    """unlock a journal entry"""
+
+    def __init__(self, entry, **kwargs):
+        self.entry = entry
+        super(UnlockJournal, self).__init__(**kwargs)

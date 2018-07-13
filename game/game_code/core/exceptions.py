@@ -4,6 +4,10 @@ class GameRunTimeException(RuntimeError):
     pass
 
 
+class GameInvalidChoice(GameRunTimeException):
+    pass
+
+
 class GameLoadClassException(GameRunTimeException):
     pass
 

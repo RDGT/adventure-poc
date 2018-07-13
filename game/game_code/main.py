@@ -2,8 +2,8 @@ import os
 import logging
 import objects
 from interface import terminal_interface
-from interactions.lib import choices
-from interactions.lib import events
+from interactions.lib import choices, conditions, events
+from objects import item, entry
 import interactions
 import core
 
@@ -24,6 +24,8 @@ class Game(object):
         self.levels = {}
         # operation
         self.operating = False
+        # navigation | menu
+        self.menu_enter_location = None
         # navigation | screen
         self.screen_history = []
         self.next_screen = None
@@ -46,6 +48,11 @@ class Game(object):
     def add_player(self):
         self.player = objects.player.Player()
         self.player.attach_game(self)
+        self.player.inventory.add_item(item.crossbow, display=False)
+        self.player.inventory.add_item(item.holy_cross, display=False)
+        self.player.inventory.add_item(item.holy_water, display=False)
+        self.player.inventory.add_item(item.flammable_oil, display=False)
+        self.player.journal.add_entry(entry.equipped, display=False)
 
     def set_terminal_interface(self):
         interface = terminal_interface.TerminalInterface(
@@ -82,6 +89,10 @@ class Game(object):
         self.handle_screen_events(screen)
         self.handle_screen_choices(screen)
 
+    def do_menu(self, menu):
+        menu_scene = menu.generate_menu_scene()
+        self.next_screen = menu_scene.get_current_screen()
+
     def handle_screen_events(self, screen):
         if not screen.events:
             return
@@ -92,6 +103,8 @@ class Game(object):
         log.debug('handling event: event={}'.format(event))
         if isinstance(event, events.AddItem):
             self.player.inventory.add_item(event.item)
+        elif isinstance(event, events.UnlockJournal):
+            self.player.journal.add_entry(event.entry)
 
     def parse_choices(self, choice_list):
         """parses choices, enabling or disabling choices based on conditions"""
@@ -106,7 +119,7 @@ class Game(object):
 
     def handle_choice_conditions(self, choice):
         for condition in choice.conditions:
-            if isinstance(condition, choices.OnlyOnce) and choice.has_been_selected:
+            if isinstance(condition, conditions.OnlyOnce) and choice.has_been_selected:
                 choice.enabled = False
 
     def handle_screen_choices(self, screen):
@@ -134,10 +147,14 @@ class Game(object):
             self.handle_navigate(choice)
         elif isinstance(choice, choices.ChoiceInspectRoom):
             self.handle_inspect(choice)
+        elif isinstance(choice, choices.ChoiceMenuItem):
+            self.handle_menu_item(choice)
         elif isinstance(choice, choices.ChoiceInventory):
-            log.debug('show inventory')
+            self.handle_enter_menu(self.player.inventory)
         elif isinstance(choice, choices.ChoiceJournal):
-            log.debug('show journal')
+            self.handle_enter_menu(self.player.journal)
+        elif isinstance(choice, choices.ChoiceExitMenu):
+            self.handle_exit_menu()
         else:
             raise core.exceptions.GameConfigurationException('Bad Choice', choice)
 
@@ -167,6 +184,20 @@ class Game(object):
         scene = self.current_room.get_scene(choice.scene)
         self.change_scene(scene)
         self.next_screen = scene.get_current_screen()
+
+    def handle_enter_menu(self, menu):
+        self.menu_enter_location = (self.current_level, self.current_room, self.current_scene, self.current_screen)
+        log.debug('entering menu: saving={}'.format(self.menu_enter_location))
+        self.do_menu(menu)
+
+    def handle_menu_item(self, choice):
+        log.debug('menu item: choice={}'.format(choice))
+        self.next_screen = choice.menu_item
+
+    def handle_exit_menu(self):
+        log.debug('exiting menu: loading={}'.format(self.menu_enter_location))
+        level_, room_, scene_, screen_ = self.menu_enter_location
+        self.next_screen = screen_
 
     def load_levels(self):
         # level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))

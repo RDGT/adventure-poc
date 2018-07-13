@@ -48,8 +48,8 @@ class Scene(object):
         # game holder
         self.game = None
         self.screens = {}
-        # add scene intro screen
-        self.add_screen('intro', Screen(self.name, opening_text, prompt, choices, events))
+        # add scene intro screen / all leftover kwargs are sent - please consume kwargs before
+        self.add_screen('intro', Screen(self.name, opening_text, prompt, choices, events, **kwargs))
         # location in scene (start at intro)
         self.current_screen = 'intro'
         super(Scene, self).__init__()
