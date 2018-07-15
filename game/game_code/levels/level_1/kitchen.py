@@ -1,5 +1,5 @@
 from game_code import interactions
-from game_code.interactions.lib import choices, events, conditions
+from game_code.interactions.lib import choices, events, conditions, scene
 from game_code.objects import item, entry
 
 kitchen = interactions.room.Room(
@@ -8,32 +8,46 @@ kitchen = interactions.room.Room(
                  'Cobwebs and dust cover every part of the room.\n'
                  'On the floor before you lies a corpse, chained to the large stone stove.\n'
                  'The corpse is shriveled from decay and is... mumbling...',
+    screens=[
+        scene.Screen(
+            title='Ashes',
+            text='You walk into what used to be a marvelous kitchen.\n'
+                 'Cobwebs and dust cover every part of the room.\n'
+                 'On the floor before you lies pile of ashes where a zombie used to be.'
+        ),
+        scene.Screen(
+            title='Gore',
+            text='You walk into what used to be a marvelous kitchen.\n'
+                 'Cobwebs and dust cover every part of the room.\n'
+                 'On the floor before you lies a zombie with its guts everywhere.'
+        ),
+    ],
+    room_flags={'zombie_dead': False},
     choices=[
         choices.ChoiceInspectRoom(
             text='Kneel next to the zombie and listen.',
             scene='listen_to_zombie_1',
-            conditions=[conditions.OnlyOnce()]
+            conditions=[conditions.OnlyOnce(), conditions.RoomFlagFalse('zombie_dead')]
         ),
         choices.ChoiceInspectRoom(
             text='Destroy this creature and relieve him from his torment.',
             scene='destroy_zombie',
-            conditions=[conditions.OnlyOnce()]
+            conditions=[conditions.OnlyOnce(), conditions.RoomFlagFalse('zombie_dead')]
         ),
         choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
     ],
     scenes={
         'destroy_zombie': interactions.thing.Thing(
             name='Destroy Zombie',
-            opening_text='As you come closer to the zombie his mumbles become clearer:\n'
-                         '"Mistress... Im sorry. I tried to run away... I shouldn\'t have tried to run away".\n'
-                         'He has two bite marks on his neck.',
+            opening_text='The zombie collapses into ashes.',
             choices=[
                 choices.ChoiceInspectRoom(
                     'Search the ashes',
                     scene='ashes'
                 ),
                 choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
-            ]
+            ],
+            events=[events.SetRoomScreen('Ashes')]
         ),
         'ashes': interactions.thing.Thing(
             name='Pile of Ashes',
@@ -66,7 +80,7 @@ kitchen = interactions.room.Room(
             choices=[
                 choices.ChoiceInspectRoom(
                     text='Ask for the ring',
-                    scene='listen_to_zombie_2',
+                    scene='listen_to_zombie_3',
                 ),
                 choices.ChoiceInspectRoom(
                     text='Put him out of his misery',
@@ -80,7 +94,8 @@ kitchen = interactions.room.Room(
                          'pushing through the soft and rotten flesh.\n'
                          'He then pulls it out and hands you an adorned wedding ring.',
             choices=[choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall')],
-            events=[events.AddItem(item.engagement_ring), events.UnlockJournal(entry.acquired_ring)],
+            events=[events.AddItem(item.engagement_ring), events.UnlockJournal(entry.acquired_ring),
+                    events.SetRoomScreen('Gore')],
         ),
     }
 )

@@ -16,10 +16,15 @@ class Screen(object):
         self.choices = choices
         self.events = events
         self.kwargs = kwargs
+        # been seen
+        self.seen = False
         # choice holder
         self.choice = None
         # game holder
         self.game = None
+
+    def set_seen(self):
+        self.seen = True
 
     def attach_game(self, game):
         self.game = game
@@ -33,7 +38,7 @@ class Screen(object):
 
 class Scene(object):
 
-    def __init__(self, name, opening_text, prompt=None, choices=None, events=None, **kwargs):
+    def __init__(self, name, opening_text, prompt=None, choices=None, events=None, screens=None, **kwargs):
         """
         Creates a new scene to be used in the Adventure
         :param name: the name of the scene
@@ -50,6 +55,9 @@ class Scene(object):
         self.screens = {}
         # add scene intro screen / all leftover kwargs are sent - please consume kwargs before
         self.add_screen('intro', Screen(self.name, opening_text, prompt, choices, events, **kwargs))
+        if screens:
+            for screen in screens:
+                self.add_screen(screen.title, screen)
         # location in scene (start at intro)
         self.current_screen = 'intro'
         super(Scene, self).__init__()
@@ -60,6 +68,9 @@ class Scene(object):
 
     def attach_game(self, game):
         self.game = game
+
+    def set_screen(self, screen_key):
+        self.current_screen = screen_key
 
     def get_first_screen(self):
         return self.screens['intro']

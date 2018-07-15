@@ -21,6 +21,12 @@ class Choice(object):
     def selected(self):
         self._times_chosen += 1
 
+    def disable_choice(self):
+        self.enabled = False
+
+    def enable_choice(self):
+        self.enabled = True
+
 
 class ChoiceBack(Choice):
     """returns to previous screen/scene"""

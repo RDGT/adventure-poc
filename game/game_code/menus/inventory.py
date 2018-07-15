@@ -15,3 +15,6 @@ class Inventory(menu.Menu):
         if display:
             self.game.interface.display('Added an item to your Inventory: {}'.format(item.name))
         self.items.append(item)
+
+    def has_item(self, item):
+        return bool(item in self.items)

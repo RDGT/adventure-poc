@@ -86,6 +86,7 @@ class Game(object):
     def do_screen(self, screen):
         self.change_screen(screen)
         self.interface.display_screen(screen)
+        screen.set_seen()
         self.handle_screen_events(screen)
         self.handle_screen_choices(screen)
 
@@ -105,6 +106,10 @@ class Game(object):
             self.player.inventory.add_item(event.item)
         elif isinstance(event, events.UnlockJournal):
             self.player.journal.add_entry(event.entry)
+        elif isinstance(event, events.SetRoomFlag):
+            self.current_room.set_flag(event.room_flag, event.set_to)
+        elif isinstance(event, events.SetRoomScreen):
+            self.current_room.set_screen(event.screen_key)
 
     def parse_choices(self, choice_list):
         """parses choices, enabling or disabling choices based on conditions"""
@@ -118,9 +123,24 @@ class Game(object):
         return return_list
 
     def handle_choice_conditions(self, choice):
+        # if any conditions disable the choice, we should return to prevent accidental enables,
+        # but if they enable it - keep going so that we could disable it if needed,
+        # and that it will be enabled if it was not enabled
         for condition in choice.conditions:
-            if isinstance(condition, conditions.OnlyOnce) and choice.has_been_selected:
-                choice.enabled = False
+            if isinstance(condition, conditions.OnlyOnce):
+                if choice.has_been_selected:
+                    choice.disable_choice()
+                    return
+            if isinstance(condition, conditions.RoomFlag):
+                if self.current_room.is_flag_value(condition.room_flag, condition.is_value):
+                    choice.enable_choice()
+                else:
+                    choice.disable_choice()
+                    return
+            if isinstance(condition, conditions.ConditionHasItem):
+                if not self.player.inventory.has_item(condition.item):
+                    choice.disable_choice()
+                    return
 
     def handle_screen_choices(self, screen):
         choice = None
@@ -177,7 +197,7 @@ class Game(object):
             self.change_scene(scene)
             self.next_screen = scene.get_current_screen()
         else:
-            self.next_screen = room.get_first_screen()
+            self.next_screen = room.get_current_screen()
 
     def handle_inspect(self, choice):
         log.debug('inspecting: choice={}'.format(choice))

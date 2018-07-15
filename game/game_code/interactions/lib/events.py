@@ -21,3 +21,34 @@ class UnlockJournal(Event):
     def __init__(self, entry, **kwargs):
         self.entry = entry
         super(UnlockJournal, self).__init__(**kwargs)
+
+
+class SetRoomScreen(Event):
+    """sets the room to a specific screen"""
+
+    def __init__(self, screen_key):
+        self.screen_key = screen_key
+        super(SetRoomScreen, self).__init__()
+
+
+class SetRoomFlag(Event):
+    """sets a room flag"""
+
+    def __init__(self, room_flag, set_to):
+        self.room_flag = room_flag
+        self.set_to = set_to
+        super(SetRoomFlag, self).__init__()
+
+
+class SetRoomFlagTrue(SetRoomFlag):
+    """set a room flag to True"""
+
+    def __init__(self, room_flag):
+        super(SetRoomFlagTrue, self).__init__(room_flag, set_to=True)
+
+
+class SetRoomFlagFalse(SetRoomFlag):
+    """set a room flag to False"""
+
+    def __init__(self, room_flag):
+        super(SetRoomFlagFalse, self).__init__(room_flag, set_to=False)
