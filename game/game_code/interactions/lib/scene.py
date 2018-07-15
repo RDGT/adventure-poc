@@ -1,9 +1,44 @@
-import imp
-from game_code.core import *
+import os
+from game_code import core
+
+
+class Screen(object):
+    """
+    a screen is the smallest instance of the game. the game is comprised of screens.
+    a scene can have multiple screens. and a room may have multiple scenes, while a level has multiple rooms.
+    scenes could be a puzzle, dialogue, combat, or a thing.
+    """
+
+    def __init__(self, title, text, prompt=None, choices=None, events=None, **kwargs):
+        self.title = title
+        self.text = text
+        self.prompt = prompt or 'What do you do?'
+        self.choices = choices
+        self.events = events
+        self.kwargs = kwargs
+        # been seen
+        self.seen = False
+        # choice holder
+        self.choice = None
+        # game holder
+        self.game = None
+
+    def set_seen(self):
+        self.seen = True
+
+    def attach_game(self, game):
+        self.game = game
+
+    def update_choice(self, choice):
+        self.choice = choice
+
+    def do_screen(self):
+        self.game.do_scene(self)
+
 
 class Scene(object):
 
-    def __init__(self, name, opening_text, prompt=None, options=None, **kwargs):
+    def __init__(self, name, opening_text, prompt=None, choices=None, events=None, screens=None, **kwargs):
         """
         Creates a new scene to be used in the Adventure
         :param name: the name of the scene
@@ -14,35 +49,34 @@ class Scene(object):
         """
         prompt = prompt or 'What do you do?'
         self.name = name
-        self.opening_text = opening_text
-        self.prompt = prompt
-        self.options = options or {}
         self.kwargs = kwargs
+        # game holder
+        self.game = None
+        self.screens = {}
+        # add scene intro screen / all leftover kwargs are sent - please consume kwargs before
+        self.add_screen('intro', Screen(self.name, opening_text, prompt, choices, events, **kwargs))
+        if screens:
+            for screen in screens:
+                self.add_screen(screen.title, screen)
+        # location in scene (start at intro)
+        self.current_screen = 'intro'
         super(Scene, self).__init__()
 
-    def set_options(self, options):
-        """set options on a scene"""
-        for key, value in options.items():
-            self.set_option(key, value)
+    def add_screen(self, screen_key, screen_instance):
+        screen_instance.attach_game(self.game)
+        self.screens[screen_key] = screen_instance
 
-    def set_option(self, key, destination):
-        self.options[key] = destination
+    def attach_game(self, game):
+        self.game = game
 
-    def run_scene(self, game):
-        # todo: add documentation @inbar
-        game.interface.display('==[ {} ]=='.format(self.name))
-        game.interface.display(self.opening_text)
-        if self.prompt and self.options:
-            choice = game.interface.prompt_for_choice(self.prompt, self.options.keys(), **self.kwargs)
-            next_scene = self.get_scene(self.options[choice])
-            assert isinstance(next_scene, Scene)
-            return next_scene.run_scene(game)
+    def set_screen(self, screen_key):
+        self.current_screen = screen_key
 
-    def get_scene(self, scene):
-        if isinstance(scene, Scene):
-            return scene
-        else:
-            return scene_loader(scene)
+    def get_first_screen(self):
+        return self.screens['intro']
+
+    def get_current_screen(self):
+        return self.screens[self.current_screen]
 
 
 def scene_loader(path, root=None):
@@ -52,13 +86,11 @@ def scene_loader(path, root=None):
     :param root: the root of the dir to load, defaults to levels dir
     :return:
     """
-    root = root or levels_dir
+    root = root or core.levels_dir
     # format names
     path_sections = path.split('.')
     scene_name = path_sections.pop(-1)
-    lib_name = path_sections[-1]
     library_path = '{}.py'.format(os.path.join(root, *path_sections))
-    # load module
-    module = imp.load_source(lib_name, library_path)
-    return getattr(module, scene_name)
+    # load scene
+    return core.load_class_from_file(library_path, scene_name)
 

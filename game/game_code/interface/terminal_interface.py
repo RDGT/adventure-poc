@@ -1,5 +1,7 @@
 import abstract_interface
 import logging
+import game_code.interactions.lib.choices
+from game_code.core import exceptions
 
 log = logging.getLogger('interface.terminal')
 
@@ -7,14 +9,26 @@ log = logging.getLogger('interface.terminal')
 class TerminalDecision(abstract_interface.Decision):
 
     def __init__(self, interface, decision_id, prompt, choices, **kwargs):
-        choice_map, choice_display = interface.format_choices(choices, kwargs.get('by_index', True))
+        choice_map, choice_display = interface.format_choices(
+            choices,
+            kwargs.get('add_menu_choices', True),
+            kwargs.get('add_menu_exit', False),
+        )
         self.choice_map = choice_map
-        self.valid_choices = choice_map.keys() + choice_map.values()
+        self.valid_choices = choice_map.keys()
         self.choice_display = choice_display
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
 
     def set_choice(self, choice):
-        self.choice = self.choice_map.get(choice, choice)
+        choice_obj = self.choice_map.get(choice, None)
+        if choice_obj is None and choice.isalpha():
+            if choice.isupper():
+                choice_obj = self.choice_map.get(choice.lower(), None)
+            else:
+                choice_obj = self.choice_map.get(choice.upper(), None)
+        if choice_obj is None:
+            raise exceptions.GameInvalidChoice(choice)
+        self.choice = choice_obj
 
 
 class TerminalInterface(abstract_interface.Interface):
@@ -24,15 +38,36 @@ class TerminalInterface(abstract_interface.Interface):
     not_a_valid_choice_msg = 'Error: This is not a valid choice, choose again!'
     please_select_a_choice_msg = 'please select one of the choices:'
 
-    @staticmethod
-    def format_choices(choices, by_index=True):
-        if by_index:
-            choice_map = {str(i): c for i, c in enumerate(choices, start=1)}
-            choice_display = '\n'.join(['- {}: {}'.format(k, v) for k, v in sorted(choice_map.items())])
-        else:
-            choice_map = {c: c for c in choices}
-            choice_display = '\n'.join(['- {}'.format(k) for k in choice_map.keys()])
+    def format_choices(self, choices, add_menu_choices=True, add_menu_exit=False):
+        index = 1
+        choice_map = {}
+        choice_display_lines = []
+        for choice in choices:
+            if choice.key:
+                key = str(choice.key)
+            else:
+                key = str(index)
+                index += 1
+            choice_map[key] = choice
+            choice_display_lines.append(' - [{}] : {}'.format(key, choice.text))
+        if add_menu_choices and self.menu_choices:
+            choice_map.update({c.key: c for c in self.menu_choices})
+            choice_display_lines.extend(self.menu_choices_display)
+        elif isinstance(add_menu_exit, game_code.interactions.lib.choices.ChoiceExitMenu):
+            choice_map.update({add_menu_exit.key: add_menu_exit})
+            choice_display_lines.append(add_menu_exit.text)
+        choice_display = '\n'.join(choice_display_lines)
         return choice_map, choice_display
+
+    def __init__(self, menu_choices=None):
+        if menu_choices:
+            self.menu_choices_display = ['Menu Choices: {}'.format(
+                ', '.join(['[{}] {}'.format(c.key, c.text) for c in menu_choices]))]
+        super(TerminalInterface, self).__init__(menu_choices)
+
+    def display_screen(self, screen):
+        self.display('==[ {} ]=='.format(screen.title))
+        self.display(screen.text)
 
     @staticmethod
     def display(text):
@@ -58,4 +93,13 @@ class TerminalInterface(abstract_interface.Interface):
 
     def is_valid_choice(self, decision, choice):
         assert isinstance(decision, TerminalDecision)
-        return bool(choice in decision.valid_choices)
+        valid = bool(choice in decision.valid_choices)
+        if valid:
+            return True
+        elif choice.isalpha():
+            if choice.isupper():
+                return bool(choice.lower() in decision.valid_choices)
+            else:
+                return bool(choice.upper() in decision.valid_choices)
+        else:
+            return False
