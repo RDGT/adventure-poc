@@ -50,18 +50,20 @@ class Game(object):
     def set_flag(self, flag, value):
         self.game_flags[flag] = value
 
-    def is_flag_value(self, flag, value):
-        if flag not in self.game_flags:
+    def is_flag_value(self, flag, value, default=None):
+        if default is None and flag not in self.game_flags:
             return False
-        return bool(self.game_flags.get(flag) == value)
+        return bool(self.game_flags.get(flag, default) == value)
     
     def add_player(self):
         self.player = objects.player.Player()
         self.player.attach_game(self)
+        # starting items
         self.player.inventory.add_item(item.crossbow, display=False)
         self.player.inventory.add_item(item.holy_cross, display=False)
         self.player.inventory.add_item(item.holy_water, display=False)
         self.player.inventory.add_item(item.flammable_oil, display=False)
+        # starting journal
         self.player.journal.add_entry(entry.equipped, display=False)
 
     def set_terminal_interface(self):
@@ -170,6 +172,7 @@ class Game(object):
         choice = None
         if screen.choices:
             enabled_choices = self.parse_choices(screen.choices)
+            enabled_choices.extend(self._choice_injection())
             if enabled_choices:
                 # get the choice from the choices on the screen
                 choice = self.interface.prompt_for_choice(
@@ -242,6 +245,18 @@ class Game(object):
         log.debug('exiting menu: loading={}'.format(self.menu_enter_location))
         level_, room_, scene_, screen_ = self.menu_enter_location
         self.next_screen = screen_
+
+    def _choice_injection(self):
+        """inject choices into choice list (for debugging or cheats)"""
+        inject_choices = []
+
+        debug_choices = [
+            choices.ChoiceNavigate('level2', key='level2', level='level_2', room='grande_hall', hidden=True)
+        ]
+
+        inject_choices.extend(debug_choices)
+
+        return inject_choices
 
     def load_levels(self):
         # level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))

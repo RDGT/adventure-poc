@@ -51,7 +51,8 @@ class TerminalInterface(abstract_interface.Interface):
                 key = str(index)
                 index += 1
             choice_map[key] = choice
-            choice_display_lines.append(' - [{}] : {}'.format(key, choice.text))
+            if not choice.hidden:
+                choice_display_lines.append(' - [{}] : {}'.format(key, choice.text))
         if add_menu_choices and self.menu_choices:
             choice_map.update({c.key: c for c in self.menu_choices})
             choice_display_lines.extend(self.menu_choices_display)

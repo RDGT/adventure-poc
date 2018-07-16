@@ -11,6 +11,7 @@ class Choice(object):
         self.key = kwargs.pop('key', None)
         self.conditions = kwargs.pop('conditions', [])
         self.enabled = True
+        self.hidden = kwargs.pop('hidden', False)  # for hidden choices (cheats or debug)
         self._times_chosen = 0
         super(Choice, self).__init__()
 

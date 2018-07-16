@@ -7,8 +7,9 @@ dining_room = interactions.room.Room(
     name='Dining Room',
     opening_text='You enter the dining room. A long marble table runs the length of the decorated chamber.\n'
                  'Carved wooden chairs surround the table on both sides.',
+    room_flags={'found_treasure': False, 'door_open': False},
     choices=[
-        choices.ChoiceInspectRoom('Examine the Table', 'table', conditions=[conditions.OnlyOnce()]),
+        choices.ChoiceInspectRoom('Examine the Table', 'table'),
         choices.ChoiceInspectRoom('Hidden Door', 'hidden_door',
                                   conditions=[conditions.RoomFlagTrue('door_open'),
                                               conditions.RoomFlagFalse('found_treasure')]),
@@ -20,6 +21,7 @@ dining_room = interactions.room.Room(
             opening_text='After observing the table from all sides you decide to take a look underneath.\n'
                          'You lift the silken table cloth to find an inscription carved into one of the legs\n'
                          '"Fortunes close. Masked by time"',
+            future_text='The inscription carved into one of the legs reads: "Fortunes close. Masked by time"',
             events=[events.UnlockJournal(entry.examine_table)]
         ),
         'hidden_door': interactions.thing.Thing(
@@ -46,7 +48,7 @@ dining_room = interactions.room.Room(
         'shadow_combat': interactions.combat.Combat(
             name='Combat with Shadow',
             # todo: @inbar complete the combat
-            opening_text='Combat - work in progress',
+            opening_text='Combat - work in progress - you win!',
             choices=[
                 choices.ChoiceNavigate('Leave room (temp)', level='level_2', room='grande_hall'),  # temp
             ],
@@ -99,12 +101,12 @@ dining_room = interactions.room.Room(
             opening_text='She fooled me again! I thought the ring was in the chest!\n'
                          'Nevermind... Yes have the chest! Now give me the ring!',
             choices=[
-                choices.ChoiceInspectRoom('Give Ring', 'chest'),
+                choices.ChoiceInspectRoom('Give Ring', 'chest_friendly'),
                 choices.ChoiceInspectRoom('Attack the Shadow!', 'shadow_combat'),
             ],
             events=[events.UnlockJournal(entry.robert_ring)]
         ),
-        'chest': interactions.thing.Thing(
+        'chest_friendly': interactions.thing.Thing(
             name='Chest',
             opening_text='The ring floats gently from your hand and robert swirls around it.\n'
                          'with a sharp glow he vanishes, leaving behind a few fading sparks.\n'
@@ -114,8 +116,26 @@ dining_room = interactions.room.Room(
             choices=[
                 choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
-            events=[events.RemoveItem(item.engagement_ring), events.SetRoomFlagTrue('found_treasure'),
-                    events.UnlockJournal(entry.found_treasure)],
+            events=[
+                events.RemoveItem(item.engagement_ring),
+                events.SetRoomFlagTrue('found_treasure'),
+                events.UnlockJournal(entry.found_treasure)
+            ],
         ),
+        # 'chest_victory': interactions.thing.Thing(
+        #     name='Chest',
+        #     opening_text='The ring floats gently from your hand and robert swirls around it.\n'
+        #                  'with a sharp glow he vanishes, leaving behind a few fading sparks.\n'
+        #                  'You open the chest and find a stack of gold coins and a mummified head.\n'
+        #                  'A note attached to the head reads "Robert".',
+        #     # todo: @alon do we want to add the stack of coins or Roberts head as items?
+        #     choices=[
+        #         choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
+        #     ],
+        #     events=[
+        #         events.SetRoomFlagTrue('found_treasure'),
+        #         events.UnlockJournal(entry.found_treasure)
+        #     ],
+        # ),
     }
 )

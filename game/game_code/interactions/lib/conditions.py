@@ -60,9 +60,10 @@ class PlayerMissingItem(ChoiceCondition):
 class GameFlag(ChoiceCondition):
     """a condition which will enable the choice once the game flag is a certain value"""
 
-    def __init__(self, game_flag, is_value):
+    def __init__(self, game_flag, is_value, **kwargs):
         self.game_flag = game_flag
         self.is_value = is_value
+        self.default = kwargs.pop('default', None)
         super(GameFlag, self).__init__()
 
     def check_condition(self, game, **kwargs):
@@ -75,23 +76,24 @@ class GameFlag(ChoiceCondition):
 class GameFlagTrue(GameFlag):
     """a condition which will enable the choice once the game flag is True"""
 
-    def __init__(self, game_flag):
-        super(GameFlagTrue, self).__init__(game_flag, is_value=True)
+    def __init__(self, game_flag, **kwargs):
+        super(GameFlagTrue, self).__init__(game_flag, is_value=True, **kwargs)
 
 
 class GameFlagFalse(GameFlag):
     """a condition which will enable the choice once the game flag is False"""
 
-    def __init__(self, game_flag):
-        super(GameFlagFalse, self).__init__(game_flag, is_value=False)
+    def __init__(self, game_flag, **kwargs):
+        super(GameFlagFalse, self).__init__(game_flag, is_value=False, **kwargs)
 
 
 class RoomFlag(ChoiceCondition):
     """a condition which will enable the choice once the room flag is a certain value"""
 
-    def __init__(self, room_flag, is_value, level=None, room=None):
+    def __init__(self, room_flag, is_value, level=None, room=None, **kwargs):
         self.room_flag = room_flag
         self.is_value = is_value
+        self.default = kwargs.pop('default', None)
         self.level = level
         self.room = room
         super(RoomFlag, self).__init__()
@@ -100,7 +102,7 @@ class RoomFlag(ChoiceCondition):
         if self.level:
             if not self.room:
                 raise core.exceptions.GameConfigurationException(
-                    'can not set room flag on specific level without specifying room')
+                    'can not check room flag on specific level without specifying room')
             level = game.levels.get(self.level)
         else:
             level = game.current_level

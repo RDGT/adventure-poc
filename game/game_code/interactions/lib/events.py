@@ -1,4 +1,5 @@
 import logging
+from game_code import core
 
 log = logging.getLogger('interactions.events')
 
@@ -87,7 +88,18 @@ class SetRoomFlag(Event):
         super(SetRoomFlag, self).__init__()
 
     def do_event(self, game):
-        game.current_room.set_flag(self.room_flag, self.set_to)
+        if self.level:
+            if not self.room:
+                raise core.exceptions.GameConfigurationException(
+                    'can not set room flag on specific level without specifying room')
+            level = game.levels.get(self.level)
+        else:
+            level = game.current_level
+        if self.room:
+            room = level.rooms.get(self.room)
+        else:
+            room = game.current_room
+        room.set_flag(self.room_flag, self.set_to)
 
 
 class SetRoomFlagTrue(SetRoomFlag):
@@ -102,3 +114,29 @@ class SetRoomFlagFalse(SetRoomFlag):
 
     def __init__(self, room_flag, **kwargs):
         super(SetRoomFlagFalse, self).__init__(room_flag, set_to=False, **kwargs)
+        
+        
+class SetGameFlag(Event):
+    """sets a game flag"""
+
+    def __init__(self, game_flag, set_to):
+        self.game_flag = game_flag
+        self.set_to = set_to
+        super(SetGameFlag, self).__init__()
+
+    def do_event(self, game):
+        game.set_flag(self.game_flag, self.set_to)
+
+
+class SetGameFlagTrue(SetGameFlag):
+    """set a game flag to True"""
+
+    def __init__(self, game_flag):
+        super(SetGameFlagTrue, self).__init__(game_flag, set_to=True)
+
+
+class SetGameFlagFalse(SetGameFlag):
+    """set a game flag to False"""
+
+    def __init__(self, game_flag):
+        super(SetGameFlagFalse, self).__init__(game_flag, set_to=False)
