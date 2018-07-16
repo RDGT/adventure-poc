@@ -10,13 +10,13 @@ kitchen = interactions.room.Room(
                  'The corpse is shriveled from decay and is... mumbling...',
     screens={
         'ashes': scene.Screen(
-            title='Ashes',
+            title='Kitchen',
             text='You walk into what used to be a marvelous kitchen.\n'
                  'Cobwebs and dust cover every part of the room.\n'
                  'On the floor before you lies pile of ashes where a zombie used to be.'
         ),
         'gore': scene.Screen(
-            title='Gore',
+            title='Kitchen',
             text='You walk into what used to be a marvelous kitchen.\n'
                  'Cobwebs and dust cover every part of the room.\n'
                  'On the floor before you lies a zombie with its guts everywhere.'

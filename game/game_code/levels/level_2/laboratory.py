@@ -54,6 +54,7 @@ laboratory = interactions.room.Room(
             ],
             events=[
                 events.UnlockJournal(entry.little_lock_box),
+                events.AddItem(item.gem),
                 events.SetRoomFlagTrue('lock_box_broken'),
             ]
         ),

@@ -17,3 +17,4 @@ engagement_ring = Item('Engagement Ring', 'A ring found on a Zombie')
 
 # level 2 items
 nitro = Item('Nitroglycerin', 'You made a small vial of nitroglycerin')
+gem = Item('Gem', 'A ruby the size of your fist')

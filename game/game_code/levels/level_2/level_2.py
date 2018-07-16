@@ -1,5 +1,5 @@
 from game_code.interactions import level
-from game_code.levels.level_2 import dining_room, grande_hall, library, laboratory, bedroom
+from game_code.levels.level_2 import dining_room, grande_hall, library, laboratory, bedroom, statue_room
 
 
 class level_2(level.BasicLevel):
@@ -11,5 +11,6 @@ class level_2(level.BasicLevel):
         self.load_room('grande_hall', grande_hall.grande_hall)
         self.load_room('dining_room', dining_room.dining_room)
         self.load_room('library', library.library)
-        self.load_room('laborataory', laboratory.laboratory)
+        self.load_room('laboratory', laboratory.laboratory)
         self.load_room('bedroom', bedroom.bedroom)
+        self.load_room('statue_room', statue_room.statue_room)
