@@ -33,12 +33,54 @@ grande_hall = interactions.room.Room(
         # ghoul scenes
         'attack': interactions.combat.Combat(
             name='Combat with Ghoul',
-            # todo: @inbar complete the combat
-            opening_text='Combat - work in progress - you win!',
+            opening_text='Choose your weapon',
             choices=[
-                choices.ChoiceNavigate('Leave room (temp)', level='level_2', room='grande_hall'),  # temp
+                choices.ChoiceInspectRoom('Holy Cross', 'cross',
+                                          conditions=[conditions.PlayerHasItem(item.holy_cross)]),
+                choices.ChoiceInspectRoom('Crossbow', 'crossbow',
+                                          conditions=[conditions.PlayerHasItem(item.crossbow)]),
+                choices.ChoiceInspectRoom('Holy water', 'water',
+                                          conditions=[conditions.PlayerHasItem(item.holy_water)]),
+                choices.ChoiceInspectRoom('burn with oil', 'burn',
+                                          conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
             ],
+        ),
+        'cross': interactions.thing.Thing(
+            name='Combat with Ghoul',
+            opening_text='You raise you cross before the ghoul.\n'
+                         'He hisses and cowers away from the light.\n'
+                         'You advance towards him as his skin melts away,\n'
+                         'then this flesh until he crumbles into a pile of bones.',
             events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)]
+        ),
+        'crossbow': interactions.thing.Thing(
+            name='Combat with Ghoul',
+            opening_text='Without hesitation you raise your crossbow and shoot a bolt straight into the gouls heart.\n'
+                         'The power of the blow sends him flying to his back where he lies motionless.',
+            events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)]
+        ),
+        'water': interactions.thing.Thing(
+            name='Combat with Ghoul',
+            opening_text='With a sudden swift motion you splash the butler with the holy water.\n'
+                         'He barely has time to scream before he melts down to the floor in a puddle of ooz.',
+            events=[
+                events.SetRoomScreen('grande_hall'),
+                events.UnlockJournal(entry.ghoul_defeated),
+                events.RemoveItem(item.holy_water),  # todo: @alon remove it after use right?
+            ]
+        ),
+        'burn': interactions.thing.Thing(
+            name='Combat with Ghoul',
+            opening_text='You bite the cork off from the oil bottle and splash the contents on the ghoul.\n'
+                         'At first he is simply surprised but his look turns into fear\n'
+                         'as the sparks from your flint fly in his direction.\n'
+                         'The oil catches flames and the ghoul screams.\n'
+                         'Within a few moments there is nothing but ashe.',
+            events=[
+                events.SetRoomScreen('grande_hall'),
+                events.UnlockJournal(entry.ghoul_defeated),
+                events.RemoveItem(item.flammable_oil),  # todo: @alon remove it after use right?
+            ]
         ),
         'speak': interactions.thing.Thing(
             name='Ghoul',
