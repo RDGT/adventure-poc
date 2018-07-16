@@ -49,11 +49,16 @@ dining_room = interactions.room.Room(
             name='Combat with Shadow',
             opening_text='The shadow wails an echoing shriek!',
             choices=[
-                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
-                choices.ChoiceInspectRoom('Shoot Him!', 'shoot'),
-                choices.ChoiceInspectRoom('Holy Water!', 'water'),
-                choices.ChoiceInspectRoom('FIRE!', 'fire'),
-                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro'),
+                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished',
+                                          conditions=[conditions.PlayerHasItem(item.holy_cross)]),
+                choices.ChoiceInspectRoom('Shoot Him!', 'shoot',
+                                          conditions=[conditions.PlayerHasItem(item.crossbow)]),
+                choices.ChoiceInspectRoom('Holy Water!', 'water',
+                                          conditions=[conditions.PlayerHasItem(item.holy_water)]),
+                choices.ChoiceInspectRoom('FIRE!', 'fire',
+                                          conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
+                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro',
+                                          conditions=[conditions.PlayerHasItem(item.nitro)]),
             ],
         ),
         'banished': interactions.thing.Thing(
@@ -74,8 +79,8 @@ dining_room = interactions.room.Room(
             choices=[
                 choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
                 choices.ChoiceInspectRoom('Holy Water!', 'water', conditions=[conditions.RoomFlagFalse('water')]),
-                choices.ChoiceInspectRoom('FIRE!', 'fire'),
-                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro'),
+                choices.ChoiceInspectRoom('FIRE!', 'fire', conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
+                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro', conditions=[conditions.PlayerHasItem(item.nitro)]),
             ],
             events=[
                 events.SetRoomFlagTrue('shoot')
@@ -88,11 +93,12 @@ dining_room = interactions.room.Room(
             choices=[
                 choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
                 choices.ChoiceInspectRoom('Shoot Him!', 'shoot', conditions=[conditions.RoomFlagFalse('shoot')]),
-                choices.ChoiceInspectRoom('FIRE!', 'fire'),
-                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro'),
+                choices.ChoiceInspectRoom('FIRE!', 'fire', conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
+                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro', conditions=[conditions.PlayerHasItem(item.nitro)]),
             ],
             events=[
-                events.SetRoomFlagTrue('water')
+                events.SetRoomFlagTrue('water'),
+                events.RemoveItem(item.holy_water),  # todo: @alon remove it after use right?
             ]
         ),
         'fire': interactions.thing.Thing(
@@ -102,6 +108,7 @@ dining_room = interactions.room.Room(
                          'The shadow shrieks and burns before you. When the flames dies the chest remains.',
             choices=[
                 choices.ChoiceInspectRoom('Open Chest', 'chest'),
+                events.RemoveItem(item.flammable_oil),  # todo: @alon remove it after use right?
             ],
         ),
         'nitro': interactions.thing.Thing(
@@ -112,7 +119,10 @@ dining_room = interactions.room.Room(
             choices=[
                 choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
-            events=[events.SetRoomFlagTrue('found_treasure')]
+            events=[
+                events.SetRoomFlagTrue('found_treasure'),
+                events.RemoveItem(item.nitro),  # todo: @alon remove it after use right?
+            ]
         ),
         'robert': interactions.thing.Thing(
             name='Robert',
