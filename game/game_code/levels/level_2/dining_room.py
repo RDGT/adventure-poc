@@ -77,7 +77,8 @@ dining_room = interactions.room.Room(
                          'The shadow then flies right through you!\n'
                          'A cold pain hits your lungs as you turn to face the shadow once more.',
             choices=[
-                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
+                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished',
+                                          conditions=[conditions.PlayerHasItem(item.holy_cross)]),
                 choices.ChoiceInspectRoom('Holy Water!', 'water', conditions=[conditions.RoomFlagFalse('water')]),
                 choices.ChoiceInspectRoom('FIRE!', 'fire', conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
                 choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro', conditions=[conditions.PlayerHasItem(item.nitro)]),
@@ -91,7 +92,8 @@ dining_room = interactions.room.Room(
             opening_text='You splash the water at the shadow only for it to pass through him and spread on the floor.\n'
                          'The shadow flies through you leaving an echoing ring in your ears. You grow dizzy.',
             choices=[
-                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
+                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished',
+                                          conditions=[conditions.PlayerHasItem(item.holy_cross)]),
                 choices.ChoiceInspectRoom('Shoot Him!', 'shoot', conditions=[conditions.RoomFlagFalse('shoot')]),
                 choices.ChoiceInspectRoom('FIRE!', 'fire', conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
                 choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro', conditions=[conditions.PlayerHasItem(item.nitro)]),
