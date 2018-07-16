@@ -39,7 +39,12 @@ grande_hall = interactions.room.Room(
                 choices.ChoiceInspectRoom('Ask to meet mistress', 'speak_mistress2'),
                 choices.ChoiceInspectRoom('Attack Ghoul', 'attack'),
             ],
-            events=[]  # todo: @inbar unlock journal robert conditional with ring or without ring
+            events=[events.ConditionalUnlockJournal(
+                [
+                    (conditions.PlayerHasItem(item.engagement_ring), entry.ask_about_servants_with_ring),
+                    (conditions.PlayerMissingItem(item.engagement_ring), entry.ask_about_servants_no_ring),
+                ]
+            )]
         ),
         'speak_mistress1': interactions.thing.Thing(
             name='Ghoul',

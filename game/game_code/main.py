@@ -112,14 +112,7 @@ class Game(object):
 
     def handle_event(self, event):
         log.debug('handling event: event={}'.format(event))
-        if isinstance(event, events.AddItem):
-            self.player.inventory.add_item(event.item)
-        elif isinstance(event, events.UnlockJournal):
-            self.player.journal.add_entry(event.entry)
-        elif isinstance(event, events.SetRoomFlag):
-            self.current_room.set_flag(event.room_flag, event.set_to)
-        elif isinstance(event, events.SetRoomScreen):
-            self.current_room.set_screen(event.screen_key)
+        event.do_event(self)
 
     def parse_choices(self, choice_list):
         """parses choices, enabling or disabling choices based on conditions"""
@@ -136,38 +129,42 @@ class Game(object):
         # if any conditions disable the choice, we should return to prevent accidental enables,
         # but if they enable it - keep going so that we could disable it if needed,
         # and that it will be enabled if it was not enabled
-        for condition in choice.conditions:
-            if isinstance(condition, conditions.OnlyOnce):
-                if choice.has_been_selected:
-                    choice.disable_choice()
-                    return
-            if isinstance(condition, conditions.RoomFlag):
-                if condition.level:
-                    if not condition.room:
-                        raise core.exceptions.GameConfigurationException(
-                            'can not set room flag on specific level without specifying room')
-                    level = self.levels.get(condition.level)
-                else:
-                    level = self.current_level
-                if condition.room:
-                    room = level.rooms.get(condition.room)
-                else:
-                    room = self.current_room
-                if room.is_flag_value(condition.room_flag, condition.is_value):
-                    choice.enable_choice()
-                else:
-                    choice.disable_choice()
-                    return
-            if isinstance(condition, conditions.GameFlag):
-                if self.is_flag_value(condition.game_flag, condition.is_value):
-                    choice.enable_choice()
-                else:
-                    choice.disable_choice()
-                    return
-            if isinstance(condition, conditions.PlayerHasItem):
-                if not self.player.inventory.has_item(condition.item):
-                    choice.disable_choice()
-                    return
+        condition_modifier = self.check_conditions(choice.conditions, choice=choice)
+        if condition_modifier == -1:
+            choice.disable_choice()
+        elif condition_modifier == 0:
+            pass
+        elif condition_modifier == 1:
+            choice.enable_choice()
+        else:
+            log.error('illegal modifier for condition: modifier={} condition_list={}'.format(
+                condition_modifier, choice.conditions))
+            raise core.exceptions.GameRunTimeException('illegal modifier for condition: {}'.format(condition_modifier))
+
+    def check_conditions(self, condition_list, **kwargs):
+        """
+        checks the conditions,
+        if the list of conditions contains any conditions disable, will return -1
+        if the list of conditions does not require any action, will return 0
+        if the list of conditions should enable, will return 1
+        :param condition_list:
+        :return:
+        """
+        modifier = 0
+        for condition in condition_list:
+            log.debug('handling condition: condition={}'.format(condition))
+            action = condition.check_condition(self, **kwargs)
+            if action == -1:
+                modifier = -1
+                break
+            elif action == 0:
+                pass
+            elif action == 1:
+                modifier = 1
+            else:
+                log.error('invalid action for condition: action={} condition={}'.format(action, condition))
+                raise core.exceptions.GameRunTimeException('invalid action for condition: {}'.format(action))
+        return modifier
 
     def handle_screen_choices(self, screen):
         choice = None
@@ -248,7 +245,7 @@ class Game(object):
 
     def load_levels(self):
         # level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
-        level_dirs = ['level_1']  # todo: this is just for the beginning so i don't need to do it all
+        level_dirs = ['level_1', 'level_2']  # todo: this is just for the beginning so i don't need to do it all
         for level_name in level_dirs:
             self.load_level(level_name)
 

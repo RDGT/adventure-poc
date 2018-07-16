@@ -9,6 +9,7 @@ log = logging.getLogger('interface.terminal')
 class TerminalDecision(abstract_interface.Decision):
 
     def __init__(self, interface, decision_id, prompt, choices, **kwargs):
+        assert isinstance(interface, TerminalInterface)
         choice_map, choice_display = interface.format_choices(
             choices,
             kwargs.get('add_menu_choices', True),
@@ -20,6 +21,7 @@ class TerminalDecision(abstract_interface.Decision):
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
 
     def set_choice(self, choice):
+        self.interface.add_white_space()
         choice_obj = self.choice_map.get(choice, None)
         if choice_obj is None and choice.isalpha():
             if choice.isupper():
@@ -68,6 +70,9 @@ class TerminalInterface(abstract_interface.Interface):
     def display_screen(self, screen):
         self.display('==[ {} ]=='.format(screen.title))
         self.display(screen.text)
+
+    def add_white_space(self):
+        self.display('\n\n')
 
     @staticmethod
     def display(text):
