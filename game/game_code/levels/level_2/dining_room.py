@@ -7,7 +7,7 @@ dining_room = interactions.room.Room(
     name='Dining Room',
     opening_text='You enter the dining room. A long marble table runs the length of the decorated chamber.\n'
                  'Carved wooden chairs surround the table on both sides.',
-    room_flags={'found_treasure': False, 'door_open': False},
+    room_flags={'found_treasure': False, 'door_open': False, 'shoot': False, 'water': False},
     choices=[
         choices.ChoiceInspectRoom('Examine the Table', 'table'),
         choices.ChoiceInspectRoom('Hidden Door', 'hidden_door',
@@ -47,11 +47,72 @@ dining_room = interactions.room.Room(
         ),
         'shadow_combat': interactions.combat.Combat(
             name='Combat with Shadow',
-            # todo: @inbar complete the combat
-            opening_text='Combat - work in progress - you win!',
+            opening_text='The shadow wails an echoing shriek!',
             choices=[
-                choices.ChoiceNavigate('Leave room (temp)', level='level_2', room='grande_hall'),  # temp
+                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
+                choices.ChoiceInspectRoom('Shoot Him!', 'shoot'),
+                choices.ChoiceInspectRoom('Holy Water!', 'water'),
+                choices.ChoiceInspectRoom('FIRE!', 'fire'),
+                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro'),
             ],
+        ),
+        'banished': interactions.thing.Thing(
+            name='Combat with Shadow',
+            opening_text='You hold the cross forward and recite prayer.\n'
+                         'The cross glows ever brighter as the shadow shrieks and shrinks away\n'
+                         'until there is nothing but beaming light. The Chest is yours for the taking.',
+            choices=[
+                choices.ChoiceInspectRoom('Open Chest', 'chest'),
+            ],
+        ),
+        'shoot': interactions.thing.Thing(
+            name='Combat with Shadow',
+            opening_text='You aim quickly and shoot a bolt at the menacing shadow.\n'
+                         'The bolt goes through him and gets lodged in the treasure chest.\n'
+                         'The shadow then flies right through you!\n'
+                         'A cold pain hits your lungs as you turn to face the shadow once more.',
+            choices=[
+                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
+                choices.ChoiceInspectRoom('Holy Water!', 'water', conditions=[conditions.RoomFlagFalse('water')]),
+                choices.ChoiceInspectRoom('FIRE!', 'fire'),
+                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro'),
+            ],
+            events=[
+                events.SetRoomFlagTrue('shoot')
+            ]
+        ),
+        'water': interactions.thing.Thing(
+            name='Combat with Shadow',
+            opening_text='You splash the water at the shadow only for it to pass through him and spread on the floor.\n'
+                         'The shadow flies through you leaving an echoing ring in your ears. You grow dizzy.',
+            choices=[
+                choices.ChoiceInspectRoom('Banish him with the cross!', 'banished'),
+                choices.ChoiceInspectRoom('Shoot Him!', 'shoot', conditions=[conditions.RoomFlagFalse('shoot')]),
+                choices.ChoiceInspectRoom('FIRE!', 'fire'),
+                choices.ChoiceInspectRoom('Nitroglycerin!', 'nitro'),
+            ],
+            events=[
+                events.SetRoomFlagTrue('water')
+            ]
+        ),
+        'fire': interactions.thing.Thing(
+            name='Combat with Shadow',
+            opening_text='You quickly pour the oil in a wide arch between you and the shadow.\n'
+                         'As the evil shade charges forward you ignite the oil with your flint.\n'
+                         'The shadow shrieks and burns before you. When the flames dies the chest remains.',
+            choices=[
+                choices.ChoiceInspectRoom('Open Chest', 'chest'),
+            ],
+        ),
+        'nitro': interactions.thing.Thing(
+            name='Combat with Shadow',
+            opening_text='You jump back out of the room as you toss the vial of nitroglycerin inside.\n'
+                         'A loud explosion sends debris and smoke flying out through the door.\n'
+                         'As you look inside the shadow is gone, but the chest and its contents have been destroyed.',
+            choices=[
+                choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
+            ],
+            events=[events.SetRoomFlagTrue('found_treasure')]
         ),
         'robert': interactions.thing.Thing(
             name='Robert',
@@ -101,41 +162,34 @@ dining_room = interactions.room.Room(
             opening_text='She fooled me again! I thought the ring was in the chest!\n'
                          'Nevermind... Yes have the chest! Now give me the ring!',
             choices=[
-                choices.ChoiceInspectRoom('Give Ring', 'chest_friendly'),
+                choices.ChoiceInspectRoom('Give Ring', 'gave_ring'),
                 choices.ChoiceInspectRoom('Attack the Shadow!', 'shadow_combat'),
             ],
             events=[events.UnlockJournal(entry.robert_ring)]
         ),
-        'chest_friendly': interactions.thing.Thing(
-            name='Chest',
+        'gave_ring': interactions.thing.Thing(
+            name='Robert',
             opening_text='The ring floats gently from your hand and robert swirls around it.\n'
-                         'with a sharp glow he vanishes, leaving behind a few fading sparks.\n'
-                         'You open the chest and find a stack of gold coins and a mummified head.\n'
+                         'with a sharp glow he vanishes, leaving behind a few fading sparks.',
+            choices=[
+                choices.ChoiceInspectRoom('Open Chest', 'chest'),
+            ],
+            events=[
+                events.RemoveItem(item.engagement_ring),
+            ],
+        ),
+        'chest': interactions.thing.Thing(
+            name='Chest',
+            opening_text='You open the chest and find a stack of gold coins and a mummified head.\n'
                          'A note attached to the head reads "Robert".',
             # todo: @alon do we want to add the stack of coins or Roberts head as items?
             choices=[
                 choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
             events=[
-                events.RemoveItem(item.engagement_ring),
                 events.SetRoomFlagTrue('found_treasure'),
                 events.UnlockJournal(entry.found_treasure)
             ],
         ),
-        # 'chest_victory': interactions.thing.Thing(
-        #     name='Chest',
-        #     opening_text='The ring floats gently from your hand and robert swirls around it.\n'
-        #                  'with a sharp glow he vanishes, leaving behind a few fading sparks.\n'
-        #                  'You open the chest and find a stack of gold coins and a mummified head.\n'
-        #                  'A note attached to the head reads "Robert".',
-        #     # todo: @alon do we want to add the stack of coins or Roberts head as items?
-        #     choices=[
-        #         choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
-        #     ],
-        #     events=[
-        #         events.SetRoomFlagTrue('found_treasure'),
-        #         events.UnlockJournal(entry.found_treasure)
-        #     ],
-        # ),
     }
 )
