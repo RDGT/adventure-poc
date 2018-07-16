@@ -20,6 +20,8 @@ class Game(object):
         self.level_dir = core.levels_dir
         self.player = None
         self.interface = None
+        # flag holder
+        self.game_flags = {}
         # level holder
         self.levels = {}
         # operation
@@ -44,7 +46,15 @@ class Game(object):
         self.current_level = None
         self.previous_level = None
         super(Game, self).__init__()
+    
+    def set_flag(self, flag, value):
+        self.game_flags[flag] = value
 
+    def is_flag_value(self, flag, value):
+        if flag not in self.game_flags:
+            return False
+        return bool(self.game_flags.get(flag) == value)
+    
     def add_player(self):
         self.player = objects.player.Player()
         self.player.attach_game(self)
@@ -132,12 +142,29 @@ class Game(object):
                     choice.disable_choice()
                     return
             if isinstance(condition, conditions.RoomFlag):
-                if self.current_room.is_flag_value(condition.room_flag, condition.is_value):
+                if condition.level:
+                    if not condition.room:
+                        raise core.exceptions.GameConfigurationException(
+                            'can not set room flag on specific level without specifying room')
+                    level = self.levels.get(condition.level)
+                else:
+                    level = self.current_level
+                if condition.room:
+                    room = level.rooms.get(condition.room)
+                else:
+                    room = self.current_room
+                if room.is_flag_value(condition.room_flag, condition.is_value):
                     choice.enable_choice()
                 else:
                     choice.disable_choice()
                     return
-            if isinstance(condition, conditions.ConditionHasItem):
+            if isinstance(condition, conditions.GameFlag):
+                if self.is_flag_value(condition.game_flag, condition.is_value):
+                    choice.enable_choice()
+                else:
+                    choice.disable_choice()
+                    return
+            if isinstance(condition, conditions.PlayerHasItem):
                 if not self.player.inventory.has_item(condition.item):
                     choice.disable_choice()
                     return

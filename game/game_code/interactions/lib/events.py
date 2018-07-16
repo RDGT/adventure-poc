@@ -15,6 +15,14 @@ class AddItem(Event):
         super(AddItem, self).__init__(**kwargs)
 
 
+class RemoveItem(Event):
+    """remove an item from the inventory"""
+
+    def __init__(self, item, **kwargs):
+        self.item = item
+        super(RemoveItem, self).__init__(**kwargs)
+
+
 class UnlockJournal(Event):
     """unlock a journal entry"""
 
@@ -26,29 +34,33 @@ class UnlockJournal(Event):
 class SetRoomScreen(Event):
     """sets the room to a specific screen"""
 
-    def __init__(self, screen_key):
+    def __init__(self, screen_key, level=None, room=None):
         self.screen_key = screen_key
+        self.level = level
+        self.room = room
         super(SetRoomScreen, self).__init__()
 
 
 class SetRoomFlag(Event):
     """sets a room flag"""
 
-    def __init__(self, room_flag, set_to):
+    def __init__(self, room_flag, set_to, level=None, room=None):
         self.room_flag = room_flag
         self.set_to = set_to
+        self.level = level
+        self.room = room
         super(SetRoomFlag, self).__init__()
 
 
 class SetRoomFlagTrue(SetRoomFlag):
     """set a room flag to True"""
 
-    def __init__(self, room_flag):
-        super(SetRoomFlagTrue, self).__init__(room_flag, set_to=True)
+    def __init__(self, room_flag, **kwargs):
+        super(SetRoomFlagTrue, self).__init__(room_flag, set_to=True, **kwargs)
 
 
 class SetRoomFlagFalse(SetRoomFlag):
     """set a room flag to False"""
 
-    def __init__(self, room_flag):
-        super(SetRoomFlagFalse, self).__init__(room_flag, set_to=False)
+    def __init__(self, room_flag, **kwargs):
+        super(SetRoomFlagFalse, self).__init__(room_flag, set_to=False, **kwargs)

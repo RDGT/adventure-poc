@@ -16,5 +16,10 @@ class Inventory(menu.Menu):
             self.game.interface.display('Added an item to your Inventory: {}'.format(item.name))
         self.items.append(item)
 
+    def remove_item(self, item, display=True):
+        if display:
+            self.game.interface.display('Removed an item from your Inventory: {}'.format(item.name))
+        self.items.remove(item)
+
     def has_item(self, item):
         return bool(item in self.items)

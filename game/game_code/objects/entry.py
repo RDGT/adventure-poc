@@ -87,7 +87,7 @@ clock_scribble = Entry(
 examine_table = Entry(
     name='Carved Inscription',
     description='Iv found an inscription carved into the table.\n'
-                'It reads "fortunes close. Masked by time." Perhaps this is worth investigating.'
+                'It reads "Fortunes close. Masked by time." Perhaps this is worth investigating.'
 )
 # level 2 | Treasure room
 robert_mistress = Entry(
