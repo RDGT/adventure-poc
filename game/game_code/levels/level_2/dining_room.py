@@ -194,13 +194,14 @@ dining_room = interactions.room.Room(
             name='Chest',
             opening_text='You open the chest and find a stack of gold coins and a mummified head.\n'
                          'A note attached to the head reads "Robert".',
-            # todo: @alon do we want to add the stack of coins or Roberts head as items?
+            # todo: @alon do we want to add the stack of coins as item?
             choices=[
                 choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
             events=[
                 events.SetRoomFlagTrue('found_treasure'),
-                events.UnlockJournal(entry.found_treasure)
+                events.UnlockJournal(entry.found_treasure),
+                events.AddItem(item.head)
             ],
         ),
         # gargoyle fight

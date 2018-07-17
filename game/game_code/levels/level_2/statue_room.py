@@ -10,7 +10,8 @@ statue_room = interactions.room.Room(
                  '"Only the head of the estate may pass".',
     room_flags={'retreated': False},
     choices=[
-        choices.ChoiceInspectRoom('Present Robert\'s head', scene='head'),
+        choices.ChoiceInspectRoom('Present Robert\'s head', scene='head',
+                                  conditions=[conditions.PlayerHasItem(item.head)]),
         choices.ChoiceInspectRoom('Fight the Gargoyle', scene='fight2'),
         choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
     ],
@@ -37,24 +38,40 @@ statue_room = interactions.room.Room(
             ],
             events=[events.SetRoomScreen('clear')]
         ),
-        # == fight 1 ==
+        # == fight the Gargoyle ==
         'fight1': interactions.combat.Combat(
             name='Gargoyle attacks!',
             opening_text='You have only a fraction of a second to respond!',
             choices=[
-                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight1_cross',
+                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight_cross',
                                           conditions=[conditions.PlayerHasItem(item.holy_cross)]),
-                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight1_shoot',
+                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight_shoot',
                                           conditions=[conditions.PlayerHasItem(item.crossbow)]),
-                choices.ChoiceInspectRoom('Use Holy Water', scene='fight1_water',
+                choices.ChoiceInspectRoom('Use Holy Water', scene='fight_water',
                                           conditions=[conditions.PlayerHasItem(item.holy_water)]),
-                choices.ChoiceInspectRoom('Burn him with fire', scene='fight1_fire',
+                choices.ChoiceInspectRoom('Burn him with fire', scene='fight_fire',
                                           conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
-                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight1_nitro',
+                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight_nitro',
                                           conditions=[conditions.PlayerHasItem(item.nitro)]),
             ],
         ),
-        'fight1_cross': interactions.thing.Thing(
+        'fight2': interactions.combat.Combat(
+            name='Combat with Gargoyle',
+            opening_text='Defeating this monstrous stone construct will be no easy feat.',
+            choices=[
+                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight_cross',
+                                          conditions=[conditions.PlayerHasItem(item.holy_cross)]),
+                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight_shoot',
+                                          conditions=[conditions.PlayerHasItem(item.crossbow)]),
+                choices.ChoiceInspectRoom('Use Holy Water', scene='fight_water',
+                                          conditions=[conditions.PlayerHasItem(item.holy_water)]),
+                choices.ChoiceInspectRoom('Burn him with fire', scene='fight_fire',
+                                          conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
+                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight_nitro',
+                                          conditions=[conditions.PlayerHasItem(item.nitro)]),
+            ],
+        ),
+        'fight_cross': interactions.thing.Thing(
             name='Gargoyle attacks!',
             opening_text='You raise your cross against the gargoyle and begin to recite prayer.\n'
                          'The stone creature does not even flinch,\n'
@@ -62,78 +79,78 @@ statue_room = interactions.room.Room(
                          'The blow sends you flying back and crashing to the floor.\n'
                          'Your Holy Cross is broken!',
             choices=[
-                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight1_shoot',
+                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight_shoot',
                                           conditions=[conditions.PlayerHasItem(item.crossbow)]),
-                choices.ChoiceInspectRoom('Use Holy Water', scene='fight1_water',
+                choices.ChoiceInspectRoom('Use Holy Water', scene='fight_water',
                                           conditions=[conditions.PlayerHasItem(item.holy_water)]),
-                choices.ChoiceInspectRoom('Burn him with fire', scene='fight1_fire',
+                choices.ChoiceInspectRoom('Burn him with fire', scene='fight_fire',
                                           conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
-                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight1_nitro',
+                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight_nitro',
                                           conditions=[conditions.PlayerHasItem(item.nitro)]),
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
             events=[events.RemoveItem(item.holy_cross)]
         ),
-        'fight1_shoot': interactions.thing.Thing(
+        'fight_shoot': interactions.thing.Thing(
             name='Gargoyle attacks!',
             opening_text='Without hesitation you bring up the loaded crossbow\n'
                          'and shoot the gargoyle directly in the eye.\n'
                          'The bolt breaks against the stone eye and the gargoyles charge is unhindered.\n'
                          'With a hard stone fist he sends you flying against a wall.',
             choices=[
-                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight1_cross',
+                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight_cross',
                                           conditions=[conditions.PlayerHasItem(item.holy_cross)]),
-                choices.ChoiceInspectRoom('Use Holy Water', scene='fight1_water',
+                choices.ChoiceInspectRoom('Use Holy Water', scene='fight_water',
                                           conditions=[conditions.PlayerHasItem(item.holy_water)]),
-                choices.ChoiceInspectRoom('Burn him with fire', scene='fight1_fire',
+                choices.ChoiceInspectRoom('Burn him with fire', scene='fight_fire',
                                           conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
-                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight1_nitro',
+                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight_nitro',
                                           conditions=[conditions.PlayerHasItem(item.nitro)]),
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
             events=[events.RemoveItem(item.holy_cross)]
         ),
-        'fight1_water': interactions.thing.Thing(
+        'fight_water': interactions.thing.Thing(
             name='Gargoyle attacks!',
             opening_text='You retreat to make some space between you and the monster,\n'
                          'then throw the vial of holy water. The vial breaks against the stone skin of the gargoyle\n'
                          'yet seems to have no effect. The attack continues!',
             choices=[
-                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight1_cross',
+                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight_cross',
                                           conditions=[conditions.PlayerHasItem(item.holy_cross)]),
-                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight1_shoot',
+                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight_shoot',
                                           conditions=[conditions.PlayerHasItem(item.crossbow)]),
-                choices.ChoiceInspectRoom('Burn him with fire', scene='fight1_fire',
+                choices.ChoiceInspectRoom('Burn him with fire', scene='fight_fire',
                                           conditions=[conditions.PlayerHasItem(item.flammable_oil)]),
-                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight1_nitro',
+                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight_nitro',
                                           conditions=[conditions.PlayerHasItem(item.nitro)]),
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
             events=[events.RemoveItem(item.holy_cross)]
         ),
-        'fight1_fire': interactions.thing.Thing(
+        'fight_fire': interactions.thing.Thing(
             name='Gargoyle attacks!',
             opening_text='You throw the oil vial at the gargoyle and dive out of the way as he charges forward.\n'
                          'You get up quickly and send a few glowing sparks from your flint.\n'
                          'The gargoyle catches fire yet does not slow down. The attack continues!',
             choices=[
-                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight1_cross',
+                choices.ChoiceInspectRoom('Use Holy Cross', scene='fight_cross',
                                           conditions=[conditions.PlayerHasItem(item.holy_cross)]),
-                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight1_shoot',
+                choices.ChoiceInspectRoom('Shoot crossbow', scene='fight_shoot',
                                           conditions=[conditions.PlayerHasItem(item.crossbow)]),
-                choices.ChoiceInspectRoom('Use Holy Water', scene='fight1_water',
+                choices.ChoiceInspectRoom('Use Holy Water', scene='fight_water',
                                           conditions=[conditions.PlayerHasItem(item.holy_water)]),
-                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight1_nitro',
+                choices.ChoiceInspectRoom('Throw Nitroglycerin', scene='fight_nitro',
                                           conditions=[conditions.PlayerHasItem(item.nitro)]),
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
             events=[events.RemoveItem(item.holy_cross)]
         ),
-        'fight1_nitro': interactions.thing.Thing(
+        'fight_nitro': interactions.thing.Thing(
             name='Gargoyle attacks!',
             opening_text='You toss the vial of nitroglycerin and duck for cover\n'
                          'as a large explosion sends debris in all directions.',
@@ -154,15 +171,6 @@ statue_room = interactions.room.Room(
                 choices.ChoiceBackToRoom('Back to the Statue Room', conditions=[conditions.RoomFlagTrue('retreated')]),
             ],
             events=[events.RemoveItem(item.holy_cross), events.SetRoomScreen('clear')]
-        ),
-        # == fight 2 ==
-        'fight2': interactions.combat.Combat(
-            name='Combat with Gargoyle',
-            opening_text='Defeating this monstrous stone construct will be no easy feat.',
-            choices=[
-                choices.ChoiceNavigate('Leave room (temp)', level='level_2', room='grande_hall'),  # temp
-            ],
-        ),
-
+        )
     }
 )
