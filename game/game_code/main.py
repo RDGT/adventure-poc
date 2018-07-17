@@ -196,7 +196,10 @@ class Game(object):
         inject_choices = []
 
         debug_choices = [
-            choices.ChoiceNavigate('level2', key='level2', level='level_2', room='grande_hall', hidden=True)
+            choices.ChoiceNavigate('level2', key='level2',
+                                   level='level_2', room='grande_hall', hidden=True),
+            choices.ChoiceNavigate('garg1', key='garg1',
+                                   level='level_2', room='statue_room', scene='fight1', hidden=True),
         ]
 
         inject_choices.extend(debug_choices)

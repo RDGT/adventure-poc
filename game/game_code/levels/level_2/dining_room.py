@@ -203,5 +203,15 @@ dining_room = interactions.room.Room(
                 events.UnlockJournal(entry.found_treasure)
             ],
         ),
+        # gargoyle fight
+        'gargoyle_fight': interactions.thing.Thing(
+            name='Dining Room',
+            opening_text='You rush into the dining room, jump onto the marble table and continue to try\n'
+                         'and put as much distance between you and the hulking beast.\n'
+                         'You turn back just as the gargoyle enters the room and slams the table.\n'
+                         'The blow sends you flying in the air like a catapult.\n'
+                         'You fly over the gargoyles head and manage to land in a diving roll\n'
+                         'and escape back to the Grande Hall.',
+        )
     }
 )

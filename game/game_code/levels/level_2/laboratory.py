@@ -58,5 +58,34 @@ laboratory = interactions.room.Room(
                 events.SetRoomFlagTrue('lock_box_broken'),
             ]
         ),
+        # gargoyle fight
+        'gargoyle_fight': interactions.thing.Thing(
+            name='Laboratory',
+            opening_text='Running into the laboratory you narrowly avoid another stone fist.\n'
+                         'The gargoyle looses ballance and crashes into a cauldron,\n'
+                         'sending sparks of fire in every direction.\n'
+                         'The gargoyle, covered in flames rears for another attack.',
+            choices=[choices.ChoiceInspectRoom('Bait the gargoyle', 'gargoyle_bait')]
+        ),
+        'gargoyle_bait': interactions.thing.Thing(
+            name='Laboratory',
+            opening_text='You position yourself behind the chemistry apparatus.\n'
+                         'The gargoyle shakes the room with a mighty roar and charges straight at you.\n'
+                         'Just at the right time you leap out of the way as the gargoyle\n'
+                         'collides with the nitro filled glass.\n'
+                         'A large explosion catches you mid air and slams you against the wall.',
+            choices=[choices.ChoiceInspectRoom('Stand up', 'gargoyle_gone')]
+        ),
+        'gargoyle_gone': interactions.thing.Thing(
+            name='Laboratory',
+            opening_text='Standing back up you prepare for another attack but as the smoke settles\n'
+                         'the only thing left of the gargoyle are nothing more than scattered rocks.\n'
+                         'The path in the statue room is now clear.',
+            choices=[
+                choices.ChoiceNavigate('Go back to the Grande Hall', level='level_2', room='grande_hall'),
+                choices.ChoiceNavigate('Go back to the Statue Room', level='level_2', room='statue_room'),
+            ],
+            events=[events.SetRoomScreen('clear', room='statue_room')]
+        )
     }
 )

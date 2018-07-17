@@ -24,5 +24,13 @@ library = interactions.room.Room(
                 events.SetGameFlagTrue('clock_scribble'),
             ]
         ),
+        # gargoyle fight
+        'gargoyle_fight': interactions.thing.Thing(
+            name='Library',
+            opening_text='You dart into the library and dive behind a book shelf.\n'
+                         'The gargoyle roars as it topples all the bookshelves with one great heave.\n'
+                         'You barely avoid getting trapped under the collapsing tomes.\n'
+                         'And escape back to the Grande Hall',
+        )
     }
 )

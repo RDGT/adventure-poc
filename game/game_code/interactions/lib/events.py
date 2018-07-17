@@ -83,7 +83,18 @@ class SetRoomScreen(Event):
         super(SetRoomScreen, self).__init__(**kwargs)
 
     def _do_event(self, game):
-        game.current_room.set_screen(self.screen_key)
+        if self.level:
+            if not self.room:
+                raise core.exceptions.GameConfigurationException(
+                    'can not set room flag on specific level without specifying room')
+            level = game.levels.get(self.level)
+        else:
+            level = game.current_level
+        if self.room:
+            room = level.rooms.get(self.room)
+        else:
+            room = game.current_room
+        room.set_screen(self.screen_key)
 
 
 class SetRoomFlag(Event):

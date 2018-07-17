@@ -27,7 +27,7 @@ grande_hall = interactions.room.Room(
                                           conditions=[conditions.RoomFlagTrue('clock_changed')]),
                 choices.ChoiceNavigate('Go back to the living room', level='level_1', room='living_room'),
             ]
-        )
+        ),
     },
     scenes={
         # ghoul scenes
@@ -157,5 +157,23 @@ grande_hall = interactions.room.Room(
                 events.UnlockJournal(entry.clock_hands)
             ]
         ),
+        # gargoyle fight
+        'gargoyle_fight': interactions.thing.Thing(
+            name='Grande Hall',
+            opening_text='You flee from the beast into the Grande Hall.\n'
+                         'The gargoyle gives chase, smashing his way through every passage to small to fit his size.',
+            choices=[
+                choices.ChoiceNavigate('Run to the Library',
+                                       level='level_2', room='library', scene='gargoyle_fight',
+                                       conditions=[conditions.OnlyOnce()]),
+                choices.ChoiceNavigate('Run to the Laboratory',
+                                       level='level_2', room='laboratory', scene='gargoyle_fight',
+                                       conditions=[conditions.OnlyOnce()]),
+                choices.ChoiceNavigate('Run to the Dining Room',
+                                       level='level_2', room='dining_room', scene='gargoyle_fight',
+                                       conditions=[conditions.OnlyOnce()]),
+            ],
+            events=[events.SetRoomFlagTrue('retreated', room='statue_room')]
+        )
     }
 )
