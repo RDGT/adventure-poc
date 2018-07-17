@@ -9,9 +9,18 @@ class Event(object):
     an event is how the game makes stuff happen, an evnt will add items to play inventory, or journal entries
     """
     def __init__(self, **kwargs):
+        self.already_triggered = False
+        self.can_trigger_multiple_times = kwargs.pop('can_trigger_multiple_times', False)
         super(Event, self).__init__()
 
     def do_event(self, game):
+        if self.already_triggered and not self.can_trigger_multiple_times:
+            pass  # do nothing, already triggered
+        else:
+            self._do_event(game)
+        self.already_triggered = True
+
+    def _do_event(self, game):
         raise NotImplementedError()
 
 
@@ -22,7 +31,7 @@ class AddItem(Event):
         self.item = item
         super(AddItem, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         game.player.inventory.add_item(self.item)
 
 
@@ -33,7 +42,7 @@ class RemoveItem(Event):
         self.item = item
         super(RemoveItem, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         game.player.inventory.remove_item(self.item)
 
 
@@ -44,7 +53,7 @@ class UnlockJournal(Event):
         self.entry = entry
         super(UnlockJournal, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         game.player.journal.add_entry(self.entry)
 
 
@@ -55,7 +64,7 @@ class ConditionalUnlockJournal(Event):
         self.condition_entry_tuples = condition_entry_tuples
         super(ConditionalUnlockJournal, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         for condition, entry in self.condition_entry_tuples:
             if condition.check_condition(game) in (1, 0):
                 game.player.journal.add_entry(entry)
@@ -67,27 +76,27 @@ class ConditionalUnlockJournal(Event):
 class SetRoomScreen(Event):
     """sets the room to a specific screen"""
 
-    def __init__(self, screen_key, level=None, room=None):
+    def __init__(self, screen_key, level=None, room=None, **kwargs):
         self.screen_key = screen_key
         self.level = level
         self.room = room
-        super(SetRoomScreen, self).__init__()
+        super(SetRoomScreen, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         game.current_room.set_screen(self.screen_key)
 
 
 class SetRoomFlag(Event):
     """sets a room flag"""
 
-    def __init__(self, room_flag, set_to, level=None, room=None):
+    def __init__(self, room_flag, set_to, level=None, room=None, **kwargs):
         self.room_flag = room_flag
         self.set_to = set_to
         self.level = level
         self.room = room
-        super(SetRoomFlag, self).__init__()
+        super(SetRoomFlag, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         if self.level:
             if not self.room:
                 raise core.exceptions.GameConfigurationException(
@@ -119,24 +128,24 @@ class SetRoomFlagFalse(SetRoomFlag):
 class SetGameFlag(Event):
     """sets a game flag"""
 
-    def __init__(self, game_flag, set_to):
+    def __init__(self, game_flag, set_to, **kwargs):
         self.game_flag = game_flag
         self.set_to = set_to
-        super(SetGameFlag, self).__init__()
+        super(SetGameFlag, self).__init__(**kwargs)
 
-    def do_event(self, game):
+    def _do_event(self, game):
         game.set_flag(self.game_flag, self.set_to)
 
 
 class SetGameFlagTrue(SetGameFlag):
     """set a game flag to True"""
 
-    def __init__(self, game_flag):
-        super(SetGameFlagTrue, self).__init__(game_flag, set_to=True)
+    def __init__(self, game_flag, **kwargs):
+        super(SetGameFlagTrue, self).__init__(game_flag, set_to=True, **kwargs)
 
 
 class SetGameFlagFalse(SetGameFlag):
     """set a game flag to False"""
 
-    def __init__(self, game_flag):
-        super(SetGameFlagFalse, self).__init__(game_flag, set_to=False)
+    def __init__(self, game_flag, **kwargs):
+        super(SetGameFlagFalse, self).__init__(game_flag, set_to=False, **kwargs)

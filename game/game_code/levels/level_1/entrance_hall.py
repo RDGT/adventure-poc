@@ -1,5 +1,6 @@
 from game_code import interactions
-from game_code.interactions.lib import choices
+from game_code.interactions.lib import choices, events
+from game_code.objects import entry
 
 entrance_hall = interactions.room.Room(
     name='Entrance Hall',
@@ -10,5 +11,6 @@ entrance_hall = interactions.room.Room(
         choices.ChoiceNavigate('Left door', level='level_1', room='closet_room'),
         choices.ChoiceNavigate('Front door', level='level_1', room='living_room'),
         choices.ChoiceNavigate('Right door', level='level_1', room='kitchen'),
-    ]
+    ],
+    events=[events.UnlockJournal(entry.cursed_dungeon)],
 )

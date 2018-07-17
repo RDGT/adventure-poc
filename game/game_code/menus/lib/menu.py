@@ -17,6 +17,7 @@ class Menu(object):
         raise NotImplementedError()
 
     def generate_menu_scene(self):
+        # todo: @inbar add easy navigation to menus? (by level?)
         menu_screen = menu.Menu(
             name=self.name,
             menu_items=self.menu_items

@@ -51,13 +51,15 @@ grande_hall = interactions.room.Room(
                          'He hisses and cowers away from the light.\n'
                          'You advance towards him as his skin melts away,\n'
                          'then this flesh until he crumbles into a pile of bones.',
-            events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)]
+            events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)],
+            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
         ),
         'crossbow': interactions.thing.Thing(
             name='Combat with Ghoul',
             opening_text='Without hesitation you raise your crossbow and shoot a bolt straight into the gouls heart.\n'
                          'The power of the blow sends him flying to his back where he lies motionless.',
-            events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)]
+            events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)],
+            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
         ),
         'water': interactions.thing.Thing(
             name='Combat with Ghoul',
@@ -67,7 +69,8 @@ grande_hall = interactions.room.Room(
                 events.SetRoomScreen('grande_hall'),
                 events.UnlockJournal(entry.ghoul_defeated),
                 events.RemoveItem(item.holy_water),  # todo: @alon remove it after use right?
-            ]
+            ],
+            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
         ),
         'burn': interactions.thing.Thing(
             name='Combat with Ghoul',
@@ -80,7 +83,8 @@ grande_hall = interactions.room.Room(
                 events.SetRoomScreen('grande_hall'),
                 events.UnlockJournal(entry.ghoul_defeated),
                 events.RemoveItem(item.flammable_oil),  # todo: @alon remove it after use right?
-            ]
+            ],
+            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
         ),
         'speak': interactions.thing.Thing(
             name='Ghoul',

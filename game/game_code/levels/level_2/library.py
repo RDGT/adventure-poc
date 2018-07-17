@@ -15,7 +15,7 @@ library = interactions.room.Room(
         'desk': interactions.thing.Thing(
             name='Writing Desk',
             opening_text='A few ink pads, vials and a feather.\n'
-                         'A few empty scrolls and... a scibble of a clock. The hands point at 3:15. ',
+                         'A few empty scrolls and... a scribble of a clock. The hands point at 3:15. ',
             choices=[
                 choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
             ],

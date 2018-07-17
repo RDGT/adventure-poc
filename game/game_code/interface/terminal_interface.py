@@ -70,7 +70,7 @@ class TerminalInterface(abstract_interface.Interface):
 
     def display_screen(self, screen):
         self.display('==[ {} ]=='.format(screen.title))
-        self.display(screen.text)
+        self.display(screen.text + '\n')
 
     def add_white_space(self):
         self.display('\n\n')
