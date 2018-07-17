@@ -52,14 +52,14 @@ grande_hall = interactions.room.Room(
                          'You advance towards him as his skin melts away,\n'
                          'then this flesh until he crumbles into a pile of bones.',
             events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)],
-            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
+            choices=[choices.ChoiceBackToRoom('Observe the Grande Hall')],
         ),
         'crossbow': interactions.thing.Thing(
             name='Combat with Ghoul',
             opening_text='Without hesitation you raise your crossbow and shoot a bolt straight into the gouls heart.\n'
                          'The power of the blow sends him flying to his back where he lies motionless.',
             events=[events.SetRoomScreen('grande_hall'), events.UnlockJournal(entry.ghoul_defeated)],
-            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
+            choices=[choices.ChoiceBackToRoom('Observe the Grande Hall')],
         ),
         'water': interactions.thing.Thing(
             name='Combat with Ghoul',
@@ -70,7 +70,7 @@ grande_hall = interactions.room.Room(
                 events.UnlockJournal(entry.ghoul_defeated),
                 events.RemoveItem(item.holy_water),  # todo: @alon remove it after use right?
             ],
-            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
+            choices=[choices.ChoiceBackToRoom('Observe the Grande Hall')],
         ),
         'burn': interactions.thing.Thing(
             name='Combat with Ghoul',
@@ -84,7 +84,7 @@ grande_hall = interactions.room.Room(
                 events.UnlockJournal(entry.ghoul_defeated),
                 events.RemoveItem(item.flammable_oil),  # todo: @alon remove it after use right?
             ],
-            choices=[choices.ChoiceNavigate('Observe the Grande Hall', level='level_2', room='grande_hall')],
+            choices=[choices.ChoiceBackToRoom('Observe the Grande Hall')],
         ),
         'speak': interactions.thing.Thing(
             name='Ghoul',
@@ -141,7 +141,7 @@ grande_hall = interactions.room.Room(
                                               conditions.GameFlagTrue('clock_scribble'),
                                               conditions.OnlyOnce(),
                                           ]),
-                choices.ChoiceNavigate('Leave the Clock', level='level_2', room='grande_hall'),
+                choices.ChoiceBackToRoom('Leave the clock'),
             ],
             events=[events.UnlockJournal(entry.examine_clock)]
         ),
@@ -150,6 +150,7 @@ grande_hall = interactions.room.Room(
             opening_text='As the mechanism clicks into place,\n'
                          'you hear a rumbling of stone echoing from the dining room.',
             future_text='The Clock shows 3:15, the mechanism in place',
+            choices=[choices.ChoiceBackToRoom('Leave clock')],
             events=[
                 events.SetRoomFlagTrue('clock_changed'),
                 events.SetRoomFlagTrue('door_open', room='dining_room'),

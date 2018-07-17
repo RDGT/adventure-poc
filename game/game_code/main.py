@@ -4,7 +4,6 @@ import objects
 from interface import terminal_interface
 from interactions.lib import choices, conditions, events
 from objects import item, entry
-import interactions
 import core
 
 log = logging.getLogger('game')
@@ -187,64 +186,10 @@ class Game(object):
 
     def handle_choice(self, choice):
         log.debug('handling choice: choice={}'.format(choice))
-        choice.selected()
-        if isinstance(choice, choices.ChoiceBack):
-            self.next_screen = self.previous_screen
-        elif isinstance(choice, choices.ChoiceNavigate):
-            self.handle_navigate(choice)
-        elif isinstance(choice, choices.ChoiceInspectRoom):
-            self.handle_inspect(choice)
-        elif isinstance(choice, choices.ChoiceMenuItem):
-            self.handle_menu_item(choice)
-        elif isinstance(choice, choices.ChoiceInventory):
-            self.handle_enter_menu(self.player.inventory)
-        elif isinstance(choice, choices.ChoiceJournal):
-            self.handle_enter_menu(self.player.journal)
-        elif isinstance(choice, choices.ChoiceExitMenu):
-            self.handle_exit_menu()
-        else:
-            raise core.exceptions.GameConfigurationException('Bad Choice', choice)
+        choice.make_choice(self)
 
-    def handle_navigate(self, choice):
-        log.debug('navigating: choice={}'.format(choice))
-        level = self.levels.get(choice.level)
-        if not level:
-            raise core.exceptions.GameNavigateFailure('level does not exist', level)
-        if level != self.current_level:
-            self.change_level(level)
-        assert isinstance(level, interactions.level.Level)
-        room = level.rooms.get(choice.room)
-        if not room:
-            raise core.exceptions.GameNavigateFailure('room does not exist', room)
-        assert isinstance(room, interactions.room.Room)
-        if room != self.current_room:
-            self.change_room(room)
-        if choice.scene:
-            scene = room.get_scene(choice.scene)
-            self.change_scene(scene)
-            self.next_screen = scene.get_current_screen()
-        else:
-            self.next_screen = room.get_current_screen()
-
-    def handle_inspect(self, choice):
-        log.debug('inspecting: choice={}'.format(choice))
-        scene = self.current_room.get_scene(choice.scene)
-        self.change_scene(scene)
-        self.next_screen = scene.get_current_screen()
-
-    def handle_enter_menu(self, menu):
+    def save_menu_enter_location(self):
         self.menu_enter_location = (self.current_level, self.current_room, self.current_scene, self.current_screen)
-        log.debug('entering menu: saving={}'.format(self.menu_enter_location))
-        self.do_menu(menu)
-
-    def handle_menu_item(self, choice):
-        log.debug('menu item: choice={}'.format(choice))
-        self.next_screen = choice.menu_item
-
-    def handle_exit_menu(self):
-        log.debug('exiting menu: loading={}'.format(self.menu_enter_location))
-        level_, room_, scene_, screen_ = self.menu_enter_location
-        self.next_screen = screen_
 
     def _choice_injection(self):
         """inject choices into choice list (for debugging or cheats)"""

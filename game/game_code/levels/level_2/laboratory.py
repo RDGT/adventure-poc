@@ -13,7 +13,7 @@ laboratory = interactions.room.Room(
                                   conditions=[conditions.RoomFlagFalse('made_nitro')]),
         choices.ChoiceInspectRoom(text='Little Lock Box', scene='lock_box',
                                   conditions=[conditions.RoomFlagFalse('lock_box_broken')]),
-        choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
+        choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
     ],
     scenes={
         'apparatus': interactions.thing.Thing(
@@ -24,7 +24,7 @@ laboratory = interactions.room.Room(
                 choices.ChoiceInspectRoom(text='Make Nitroglycerin', scene='nitro'),
                 choices.ChoiceInspectRoom(text='Little Lock Box', scene='lock_box',
                                           conditions=[conditions.RoomFlagFalse('lock_box_broken')]),
-                choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
+                choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
         ),
         'nitro': interactions.thing.Thing(
@@ -34,7 +34,7 @@ laboratory = interactions.room.Room(
             choices=[
                 choices.ChoiceInspectRoom(text='Little Lock Box', scene='lock_box',
                                           conditions=[conditions.RoomFlagFalse('lock_box_broken')]),
-                choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
+                choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
             events=[
                 events.UnlockJournal(entry.make_nitro),
@@ -50,7 +50,7 @@ laboratory = interactions.room.Room(
             choices=[
                 choices.ChoiceInspectRoom(text='Chemistry Apparatus', scene='apparatus',
                                           conditions=[conditions.RoomFlagFalse('made_nitro')]),
-                choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
+                choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
             ],
             events=[
                 events.UnlockJournal(entry.little_lock_box),

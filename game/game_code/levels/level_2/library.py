@@ -9,7 +9,7 @@ library = interactions.room.Room(
                  'A writing desk is pressed against the wall on the far end of the room.',
     choices=[
         choices.ChoiceInspectRoom(text='Search the writing desk', scene='desk', conditions=[conditions.OnlyOnce()]),
-        choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
+        choices.ChoiceNavigate('Leave room', level='level_2', room='grande_hall'),
     ],
     scenes={
         'desk': interactions.thing.Thing(
@@ -17,7 +17,7 @@ library = interactions.room.Room(
             opening_text='A few ink pads, vials and a feather.\n'
                          'A few empty scrolls and... a scribble of a clock. The hands point at 3:15. ',
             choices=[
-                choices.ChoiceNavigate('Leave room', level='level_1', room='entrance_hall'),
+                choices.ChoiceNavigate('Back to the Grande Hall', level='level_2', room='grande_hall'),
             ],
             events=[
                 events.UnlockJournal(entry.clock_scribble),

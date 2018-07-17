@@ -4,7 +4,6 @@ from game_code.objects import item, entry
 
 bedroom = interactions.room.Room(
     name='Bedroom',
-    # todo: @inbar make bedroom
     opening_text='You enter a lavish bedroom, but instead of a bed there is a large and beautiful coffin.\n'
                  'A vampire must certainly live here, the velvet lining on the coffin makes you certain.\n'
                  'A towering mirror is attached to the wall.',
@@ -67,7 +66,7 @@ bedroom = interactions.room.Room(
                          'as the remaining pieces fall to the floor and shatter loudly.\n'
                          'A roar is heard from the darkness as a hulking stone gargoyle barrels towards you!',
             choices=[
-                choices.ChoiceNavigate('Fight the Gargoyle!', level='level_2', room='statue_room'),
+                choices.ChoiceNavigate('Fight the Gargoyle!', level='level_2', room='statue_room', scene='fight1'),
             ],
             events=[
                 events.SetRoomScreen('revealed'),
