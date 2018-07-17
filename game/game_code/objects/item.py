@@ -15,3 +15,7 @@ flammable_oil = Item('Flammable Oil', 'A vial of flammable oil')
 iron_key = Item('Iron Key', 'Iron Key found in the pocket of a leather coat in a closet')
 engagement_ring = Item('Engagement Ring', 'A ring found on a Zombie')
 
+# level 2 items
+nitro = Item('Nitroglycerin', 'You made a small vial of nitroglycerin')
+gem = Item('Gem', 'A ruby the size of your fist')
+head = Item('Robert\'s Head', 'a mummified head, with a note attached to the head that reads "Robert".')

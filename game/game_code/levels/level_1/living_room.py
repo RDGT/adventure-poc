@@ -17,7 +17,7 @@ living_room = interactions.room.Room(
             text='Hold your holy cross firmly before the ghost and recite a banishment prayer!',
             scene='ghast_destroyed',
             conditions=[conditions.OnlyOnce(), conditions.RoomFlagFalse('ghast_dead'),
-                        conditions.ConditionHasItem(item.holy_cross)],
+                        conditions.PlayerHasItem(item.holy_cross)],
         ),
         choices.ChoiceInspectRoom(
             text='Stand your ground. There is nothing to fear. God is on your side.',
@@ -66,7 +66,7 @@ living_room = interactions.room.Room(
                 choices.ChoiceInspectRoom(
                     text='Try the key',
                     scene='gate_unlocked',
-                    conditions=[conditions.ConditionHasItem(item.iron_key)]
+                    conditions=[conditions.PlayerHasItem(item.iron_key)]
                 ),
                 choices.ChoiceNavigate('Go back to Entrance Hall', level='level_1', room='entrance_hall'),
             ],

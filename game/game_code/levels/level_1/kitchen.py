@@ -8,20 +8,20 @@ kitchen = interactions.room.Room(
                  'Cobwebs and dust cover every part of the room.\n'
                  'On the floor before you lies a corpse, chained to the large stone stove.\n'
                  'The corpse is shriveled from decay and is... mumbling...',
-    screens=[
-        scene.Screen(
-            title='Ashes',
+    screens={
+        'ashes': scene.Screen(
+            title='Kitchen',
             text='You walk into what used to be a marvelous kitchen.\n'
                  'Cobwebs and dust cover every part of the room.\n'
                  'On the floor before you lies pile of ashes where a zombie used to be.'
         ),
-        scene.Screen(
-            title='Gore',
+        'gore': scene.Screen(
+            title='Kitchen',
             text='You walk into what used to be a marvelous kitchen.\n'
                  'Cobwebs and dust cover every part of the room.\n'
                  'On the floor before you lies a zombie with its guts everywhere.'
         ),
-    ],
+    },
     room_flags={'zombie_dead': False},
     choices=[
         choices.ChoiceInspectRoom(

@@ -4,7 +4,6 @@ import objects
 from interface import terminal_interface
 from interactions.lib import choices, conditions, events
 from objects import item, entry
-import interactions
 import core
 
 log = logging.getLogger('game')
@@ -20,6 +19,8 @@ class Game(object):
         self.level_dir = core.levels_dir
         self.player = None
         self.interface = None
+        # flag holder
+        self.game_flags = {}
         # level holder
         self.levels = {}
         # operation
@@ -44,19 +45,30 @@ class Game(object):
         self.current_level = None
         self.previous_level = None
         super(Game, self).__init__()
+    
+    def set_flag(self, flag, value):
+        self.game_flags[flag] = value
 
+    def is_flag_value(self, flag, value, default=None):
+        if default is None and flag not in self.game_flags:
+            return False
+        return bool(self.game_flags.get(flag, default) == value)
+    
     def add_player(self):
         self.player = objects.player.Player()
         self.player.attach_game(self)
+        # starting items
         self.player.inventory.add_item(item.crossbow, display=False)
         self.player.inventory.add_item(item.holy_cross, display=False)
         self.player.inventory.add_item(item.holy_water, display=False)
         self.player.inventory.add_item(item.flammable_oil, display=False)
+        # starting journal
         self.player.journal.add_entry(entry.equipped, display=False)
 
     def set_terminal_interface(self):
         interface = terminal_interface.TerminalInterface(
-            menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()]
+            menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()],
+            choice_hook=self._choice_hook
         )
         self._set_interface(interface)
 
@@ -102,14 +114,7 @@ class Game(object):
 
     def handle_event(self, event):
         log.debug('handling event: event={}'.format(event))
-        if isinstance(event, events.AddItem):
-            self.player.inventory.add_item(event.item)
-        elif isinstance(event, events.UnlockJournal):
-            self.player.journal.add_entry(event.entry)
-        elif isinstance(event, events.SetRoomFlag):
-            self.current_room.set_flag(event.room_flag, event.set_to)
-        elif isinstance(event, events.SetRoomScreen):
-            self.current_room.set_screen(event.screen_key)
+        event.do_event(self)
 
     def parse_choices(self, choice_list):
         """parses choices, enabling or disabling choices based on conditions"""
@@ -126,21 +131,42 @@ class Game(object):
         # if any conditions disable the choice, we should return to prevent accidental enables,
         # but if they enable it - keep going so that we could disable it if needed,
         # and that it will be enabled if it was not enabled
-        for condition in choice.conditions:
-            if isinstance(condition, conditions.OnlyOnce):
-                if choice.has_been_selected:
-                    choice.disable_choice()
-                    return
-            if isinstance(condition, conditions.RoomFlag):
-                if self.current_room.is_flag_value(condition.room_flag, condition.is_value):
-                    choice.enable_choice()
-                else:
-                    choice.disable_choice()
-                    return
-            if isinstance(condition, conditions.ConditionHasItem):
-                if not self.player.inventory.has_item(condition.item):
-                    choice.disable_choice()
-                    return
+        condition_modifier = self.check_conditions(choice.conditions, choice=choice)
+        if condition_modifier == -1:
+            choice.disable_choice()
+        elif condition_modifier == 0:
+            pass
+        elif condition_modifier == 1:
+            choice.enable_choice()
+        else:
+            log.error('illegal modifier for condition: modifier={} condition_list={}'.format(
+                condition_modifier, choice.conditions))
+            raise core.exceptions.GameRunTimeException('illegal modifier for condition: {}'.format(condition_modifier))
+
+    def check_conditions(self, condition_list, **kwargs):
+        """
+        checks the conditions,
+        if the list of conditions contains any conditions disable, will return -1
+        if the list of conditions does not require any action, will return 0
+        if the list of conditions should enable, will return 1
+        :param condition_list:
+        :return:
+        """
+        modifier = 0
+        for condition in condition_list:
+            log.debug('handling condition: condition={}'.format(condition))
+            action = condition.check_condition(self, **kwargs)
+            if action == -1:
+                modifier = -1
+                break
+            elif action == 0:
+                pass
+            elif action == 1:
+                modifier = 1
+            else:
+                log.error('invalid action for condition: action={} condition={}'.format(action, condition))
+                raise core.exceptions.GameRunTimeException('invalid action for condition: {}'.format(action))
+        return modifier
 
     def handle_screen_choices(self, screen):
         choice = None
@@ -160,68 +186,45 @@ class Game(object):
 
     def handle_choice(self, choice):
         log.debug('handling choice: choice={}'.format(choice))
-        choice.selected()
-        if isinstance(choice, choices.ChoiceBack):
-            self.next_screen = self.previous_screen
-        elif isinstance(choice, choices.ChoiceNavigate):
-            self.handle_navigate(choice)
-        elif isinstance(choice, choices.ChoiceInspectRoom):
-            self.handle_inspect(choice)
-        elif isinstance(choice, choices.ChoiceMenuItem):
-            self.handle_menu_item(choice)
-        elif isinstance(choice, choices.ChoiceInventory):
-            self.handle_enter_menu(self.player.inventory)
-        elif isinstance(choice, choices.ChoiceJournal):
-            self.handle_enter_menu(self.player.journal)
-        elif isinstance(choice, choices.ChoiceExitMenu):
-            self.handle_exit_menu()
-        else:
-            raise core.exceptions.GameConfigurationException('Bad Choice', choice)
+        choice.make_choice(self)
 
-    def handle_navigate(self, choice):
-        log.debug('navigating: choice={}'.format(choice))
-        level = self.levels.get(choice.level)
-        if not level:
-            raise core.exceptions.GameNavigateFailure('level does not exist', level)
-        if level != self.current_level:
-            self.change_level(level)
-        assert isinstance(level, interactions.level.Level)
-        room = level.rooms.get(choice.room)
-        if not room:
-            raise core.exceptions.GameNavigateFailure('room does not exist', room)
-        assert isinstance(room, interactions.room.Room)
-        if room != self.current_room:
-            self.change_room(room)
-        if choice.scene:
-            scene = room.get_scene(choice.scene)
-            self.change_scene(scene)
-            self.next_screen = scene.get_current_screen()
-        else:
-            self.next_screen = room.get_current_screen()
-
-    def handle_inspect(self, choice):
-        log.debug('inspecting: choice={}'.format(choice))
-        scene = self.current_room.get_scene(choice.scene)
-        self.change_scene(scene)
-        self.next_screen = scene.get_current_screen()
-
-    def handle_enter_menu(self, menu):
+    def save_menu_enter_location(self):
         self.menu_enter_location = (self.current_level, self.current_room, self.current_scene, self.current_screen)
-        log.debug('entering menu: saving={}'.format(self.menu_enter_location))
-        self.do_menu(menu)
 
-    def handle_menu_item(self, choice):
-        log.debug('menu item: choice={}'.format(choice))
-        self.next_screen = choice.menu_item
+    def _choice_hook(self, choice_string, decision):
+        """hook choices the player makes to inject choices into decision choice list (for debugging or cheats)"""
+        # inject choices holder
+        inject_choices = [choices.ChoiceEnableDebugMode()]
+        # list of debugging choices
+        debug_choices = [
+            choices.ChoiceNavigate('level1', key='level1',
+                                   level='level_1', room='entrance_hall', hidden=True),
+            choices.ChoiceNavigate('level2', key='level2',
+                                   level='level_2', room='grande_hall', hidden=True),
+        ]
+        if self.is_flag_value('DEBUG', True):
+            # add debug choices to inject choices
+            inject_choices.extend(debug_choices)
+            # check for magic Teleportation
+            if choice_string.startswith('tele'):
+                parts = choice_string.split()
+                if len(parts) > 2:
+                    tele = choices.ChoiceNavigate(*parts, key='tele', hidden=True)
+                    inject_choices.append(tele)
+                    choice_string = 'tele'  # let the Teleportation happen
+                else:
+                    log.debug('teleportation requires a level and a room (and optionally a scene)')
 
-    def handle_exit_menu(self):
-        log.debug('exiting menu: loading={}'.format(self.menu_enter_location))
-        level_, room_, scene_, screen_ = self.menu_enter_location
-        self.next_screen = screen_
+        # add all inject choices to the decision
+        for inject_choice in inject_choices:
+            decision.add_choice(inject_choice)
+
+        # return choice string
+        return choice_string
 
     def load_levels(self):
         # level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
-        level_dirs = ['level_1']  # todo: this is just for the beginning so i don't need to do it all
+        level_dirs = ['level_1', 'level_2']  # todo: this is just for the beginning so i don't need to do it all
         for level_name in level_dirs:
             self.load_level(level_name)
 

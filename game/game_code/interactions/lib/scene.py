@@ -53,11 +53,13 @@ class Scene(object):
         # game holder
         self.game = None
         self.screens = {}
+        # convenience for just the text changing on a screen once after the first visit
+        self.future_text = kwargs.pop('future_text', False)
         # add scene intro screen / all leftover kwargs are sent - please consume kwargs before
         self.add_screen('intro', Screen(self.name, opening_text, prompt, choices, events, **kwargs))
         if screens:
-            for screen in screens:
-                self.add_screen(screen.title, screen)
+            for screen_key, screen in screens.items():
+                self.add_screen(screen_key, screen)
         # location in scene (start at intro)
         self.current_screen = 'intro'
         super(Scene, self).__init__()
@@ -76,6 +78,8 @@ class Scene(object):
         return self.screens['intro']
 
     def get_current_screen(self):
+        if self.current_screen == 'intro' and self.screens['intro'].seen and self.future_text:
+            self.screens['intro'].text = self.future_text
         return self.screens[self.current_screen]
 
 

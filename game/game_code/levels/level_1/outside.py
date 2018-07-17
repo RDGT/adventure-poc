@@ -13,6 +13,5 @@ outside = interactions.room.Room(
         choices.ChoiceNavigate('Open the door slowly', level='level_1', room='entrance_hall'),
         choices.ChoiceNavigate('Kick down the door!', level='level_1', room='entrance_hall'),
     ],
-    events=[events.UnlockJournal(entry.cursed_dungeon)],
     add_menu_choices=False,
 )

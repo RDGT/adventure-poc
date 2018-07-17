@@ -87,7 +87,7 @@ clock_scribble = Entry(
 examine_table = Entry(
     name='Carved Inscription',
     description='Iv found an inscription carved into the table.\n'
-                'It reads "fortunes close. Masked by time." Perhaps this is worth investigating.'
+                'It reads "Fortunes close. Masked by time." Perhaps this is worth investigating.'
 )
 # level 2 | Treasure room
 robert_mistress = Entry(
@@ -117,11 +117,11 @@ found_treasure = Entry(
 )
 # level 2 | Laboratory
 make_nitro = Entry(
-    name='Made Nitro',
-    description='Iv used the apparatus in the laboratory to make a vial of nitroglycerine.\n'
+    name='Made Nitroglycerin',
+    description='Iv used the apparatus in the laboratory to make a vial of nitroglycerin.\n'
                 'This is a very potent chemical. I should be careful when using it.'
 )
-little_lockbox = Entry(
+little_lock_box = Entry(
     name='Valuable Gem',
-    description='Iv found a valuable gem in a little lockbox'
+    description='Iv found a valuable gem in a little lock box, a ruby the size of my fist'
 )
