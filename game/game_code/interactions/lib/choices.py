@@ -57,6 +57,18 @@ class ChoiceNext(Choice):
         super(ChoiceNext, self).__init__(text, **kwargs)
 
 
+class ChoiceEnableDebugMode(Choice):
+    """go to next screen (for dialogue/long text)"""
+    def __init__(self, text='Debug Mode', **kwargs):
+        super(ChoiceEnableDebugMode, self).__init__(text, key='debug-mode', hidden=True, **kwargs)
+
+    def _make_choice(self, game):
+        log.info('enabling debug mode, next log should be a debug log')
+        logging.getLogger().setLevel(logging.DEBUG)
+        log.debug('logging set to debug')
+        game.set_flag('DEBUG', True)
+
+
 class ChoiceMenuItem(Choice):
     """view item in menu"""
     def __init__(self, menu_item, **kwargs):

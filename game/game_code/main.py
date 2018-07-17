@@ -67,7 +67,8 @@ class Game(object):
 
     def set_terminal_interface(self):
         interface = terminal_interface.TerminalInterface(
-            menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()]
+            menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()],
+            choice_hook=self._choice_hook
         )
         self._set_interface(interface)
 
@@ -171,7 +172,6 @@ class Game(object):
         choice = None
         if screen.choices:
             enabled_choices = self.parse_choices(screen.choices)
-            enabled_choices.extend(self._choice_injection())
             if enabled_choices:
                 # get the choice from the choices on the screen
                 choice = self.interface.prompt_for_choice(
@@ -191,20 +191,36 @@ class Game(object):
     def save_menu_enter_location(self):
         self.menu_enter_location = (self.current_level, self.current_room, self.current_scene, self.current_screen)
 
-    def _choice_injection(self):
-        """inject choices into choice list (for debugging or cheats)"""
-        inject_choices = []
-
+    def _choice_hook(self, choice_string, decision):
+        """hook choices the player makes to inject choices into decision choice list (for debugging or cheats)"""
+        # inject choices holder
+        inject_choices = [choices.ChoiceEnableDebugMode()]
+        # list of debugging choices
         debug_choices = [
+            choices.ChoiceNavigate('level1', key='level1',
+                                   level='level_1', room='entrance_hall', hidden=True),
             choices.ChoiceNavigate('level2', key='level2',
                                    level='level_2', room='grande_hall', hidden=True),
-            choices.ChoiceNavigate('garg1', key='garg1',
-                                   level='level_2', room='statue_room', scene='fight1', hidden=True),
         ]
+        if self.is_flag_value('DEBUG', True):
+            # add debug choices to inject choices
+            inject_choices.extend(debug_choices)
+            # check for magic Teleportation
+            if choice_string.startswith('tele'):
+                parts = choice_string.split()
+                if len(parts) > 2:
+                    tele = choices.ChoiceNavigate(*parts, key='tele', hidden=True)
+                    inject_choices.append(tele)
+                    choice_string = 'tele'  # let the Teleportation happen
+                else:
+                    log.debug('teleportation requires a level and a room (and optionally a scene)')
 
-        inject_choices.extend(debug_choices)
+        # add all inject choices to the decision
+        for inject_choice in inject_choices:
+            decision.add_choice(inject_choice)
 
-        return inject_choices
+        # return choice string
+        return choice_string
 
     def load_levels(self):
         # level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))

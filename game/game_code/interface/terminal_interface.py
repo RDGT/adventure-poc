@@ -16,9 +16,12 @@ class TerminalDecision(abstract_interface.Decision):
             kwargs.get('add_menu_exit', False),
         )
         self.choice_map = choice_map
-        self.valid_choices = choice_map.keys()
         self.choice_display = choice_display
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
+
+    @property
+    def valid_choices(self):
+        return self.choice_map.keys()
 
     def set_choice(self, choice):
         self.interface.add_white_space()
@@ -31,6 +34,11 @@ class TerminalDecision(abstract_interface.Decision):
         if choice_obj is None:
             raise exceptions.GameInvalidChoice(choice)
         self.choice = choice_obj
+
+    def add_choice(self, choice, choice_key=None):
+        """for debugging or cheats via choice_hook"""
+        choice_key = choice_key or choice.key or choice.text
+        self.choice_map[choice_key] = choice
 
 
 class TerminalInterface(abstract_interface.Interface):
@@ -46,6 +54,7 @@ class TerminalInterface(abstract_interface.Interface):
         choice_display_lines = []
         for choice in choices:
             if choice.key:
+                # todo: hardening so that choice key can not be a number and clash with indexed choices
                 key = str(choice.key)
             else:
                 key = str(index)
@@ -62,10 +71,11 @@ class TerminalInterface(abstract_interface.Interface):
         choice_display = '\n'.join(choice_display_lines)
         return choice_map, choice_display
 
-    def __init__(self, menu_choices=None):
+    def __init__(self, menu_choices=None, choice_hook=False):
         if menu_choices:
             self.menu_choices_display = ['Menu Choices: {}'.format(
                 ', '.join(['[{}] {}'.format(c.key, c.text) for c in menu_choices]))]
+        self.choice_hook = choice_hook
         super(TerminalInterface, self).__init__(menu_choices)
 
     def display_screen(self, screen):
@@ -95,6 +105,8 @@ class TerminalInterface(abstract_interface.Interface):
     def get_choice_from_player(self, decision):
         choice = raw_input(self.get_choice_prompt)
         log.debug('pfc - choice: id={} choice={}'.format(decision.prompt_id, choice))
+        if self.choice_hook and callable(self.choice_hook):
+            choice = self.choice_hook(choice, decision)
         return choice
 
     def is_valid_choice(self, decision, choice):
