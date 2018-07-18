@@ -23,13 +23,7 @@ class Decision(object):
         super(Decision, self).__init__()
 
     def get_decision(self):
-        self.initial_display()
-        while True:
-            self.prompt_for_choice()
-            if self.choice:
-                return self.choice
-            log.debug('no valid choice selected yet')
-            self.show_choices()
+        raise NotImplementedError()
 
     def initial_display(self):
         self.interface.display(self.prompt)

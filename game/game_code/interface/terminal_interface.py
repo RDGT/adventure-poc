@@ -19,6 +19,15 @@ class TerminalDecision(abstract_interface.Decision):
         self.choice_display = choice_display
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
 
+    def get_decision(self):
+        self.initial_display()
+        while True:
+            self.prompt_for_choice()
+            if self.choice:
+                return self.choice
+            log.debug('no valid choice selected yet')
+            self.show_choices()
+
     @property
     def valid_choices(self):
         return self.choice_map.keys()

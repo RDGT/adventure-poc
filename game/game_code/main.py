@@ -1,7 +1,7 @@
 import os
 import logging
 import objects
-from interface import terminal_interface
+from interface import terminal_interface, python_interface
 from interactions.lib import choices, conditions, events
 from objects import item, entry
 import core
@@ -14,7 +14,8 @@ class Game(object):
     main game object, holds everything.
     """
 
-    def __init__(self):
+    def __init__(self, *args):
+        self.args = args  # for future use?
         # components
         self.level_dir = core.levels_dir
         self.player = None
@@ -69,6 +70,13 @@ class Game(object):
         interface = terminal_interface.TerminalInterface(
             menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()],
             choice_hook=self._choice_hook
+        )
+        self._set_interface(interface)
+
+    def set_python_interface(self):
+        interface = python_interface.PythonInterface(
+            menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()],
+            # choice_hook=self._choice_hook
         )
         self._set_interface(interface)
 
@@ -269,9 +277,13 @@ class Game(object):
         self.do_screen(self.next_screen)
 
 
-def start_game(*args):
-    game = Game()
+def start_game(*args, **kwargs):
+    game = Game(*args)
     game.add_player()
-    game.set_terminal_interface()
+    if kwargs.get('interface', 'terminal') == 'terminal':
+        game.set_terminal_interface()
+    else:
+        game.set_python_interface()
     game.load_levels()
     game.start_game()
+    return game
