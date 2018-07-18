@@ -103,7 +103,10 @@ class ChoiceEnterMenu(Choice):
     def _make_choice(self, game):
         game.save_menu_enter_location()
         log.debug('entering menu: saving={}'.format(game.menu_enter_location))
-        game.do_menu(self)
+        game.do_menu(self.get_menu(game))
+
+    def get_menu(self, game):
+        raise NotImplementedError()
 
 
 class ChoiceJournal(ChoiceEnterMenu):
@@ -111,11 +114,17 @@ class ChoiceJournal(ChoiceEnterMenu):
     def __init__(self, text='Journal', **kwargs):
         super(ChoiceJournal, self).__init__(text, key='J', **kwargs)
 
+    def get_menu(self, game):
+        return game.player.journal
+
 
 class ChoiceInventory(ChoiceEnterMenu):
     """go to Inventory"""
     def __init__(self, text='Inventory', **kwargs):
         super(ChoiceInventory, self).__init__(text, key='I', **kwargs)
+
+    def get_menu(self, game):
+        return game.player.inventory
 
 
 class ChoiceNavigate(Choice):
