@@ -1,0 +1,2 @@
+from test_level_1 import TestAdventureLevelOne
+from test_functionality import TestAdventureFunctionality

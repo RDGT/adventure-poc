@@ -1,12 +1,12 @@
 from lib import entity
-from game_code.menus import Inventory, Journal
+from game_code import menus
 
 
 class Player(entity.Entity):
 
     def __init__(self):
-        self.inventory = Inventory()
-        self.journal = Journal()
+        self.inventory = menus.Inventory()
+        self.journal = menus.Journal()
         super(Player, self).__init__()
 
     def attach_game(self, game):

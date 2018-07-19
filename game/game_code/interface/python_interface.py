@@ -1,5 +1,3 @@
-import Queue
-import threading
 import abstract_interface
 import logging
 import game_code.interactions.lib.choices
@@ -31,21 +29,28 @@ class PythonDecision(abstract_interface.Decision):
             raise exceptions.GameInvalidChoice(choice)
         self.choice = choice_obj
 
-    def decision_thread(self):
-        self.prompt_for_choice()
-
-    def get_decision(self):
-        self.interface.decision_queue.put(self.choice_display)
-        t = threading.Thread(target=self.prompt_for_choice)
-        t.start()
-        while not self.choice:
-            pass
-        return self.choice
-
     def add_choice(self, choice, choice_key=None):
         """for debugging or cheats via choice_hook"""
         choice_key = choice_key or choice.key or choice.text
         self.choice_map[choice_key] = choice
+
+
+class ConsumerPackage(object):
+
+    def __init__(self, pid, title, text, prompt, choices, events):
+        self.pid = pid
+        self.title = title
+        self.text = text
+        self.prompt = prompt
+        self.choices = choices
+        self.events = events
+        super(ConsumerPackage, self).__init__()
+
+    def __str__(self):
+        return 'ConsumerPackage(pid={} title="{}" choices={})'.format(self.pid, self.title, self.choices)
+
+    def __repr__(self):
+        return str(self)
 
 
 class PythonInterface(abstract_interface.Interface):
@@ -53,8 +58,8 @@ class PythonInterface(abstract_interface.Interface):
     decision_class = PythonDecision
 
     def __init__(self, menu_choices=None):
-        self.decision_queue = Queue.Queue()
-        self.choice_queue = Queue.Queue()
+        self.__current_decision = None
+        self.__current_consumer_package = None
         super(PythonInterface, self).__init__(menu_choices)
 
     def format_choices(self, choices, add_menu_choices=True, add_menu_exit=False):
@@ -65,7 +70,7 @@ class PythonInterface(abstract_interface.Interface):
                 # todo: hardening so that choice key can not be a number and clash with indexed choices
                 key = str(choice.key)
             else:
-                key = str(index)
+                key = index
                 index += 1
             choice_map[key] = choice
 
@@ -77,34 +82,55 @@ class PythonInterface(abstract_interface.Interface):
         choice_display = {key: choice.text for key, choice in choice_map.items() if not choice.hidden}
         return choice_map, choice_display
 
-    def display_screen(self, screen):
+    def start(self):
         pass
 
-    def display_menu(self, menu):
-        pass
+    def reset_status(self):
+        self.__current_decision = None
+        self.__current_consumer_package = None
 
-    @staticmethod
-    def display(text):
-        pass
+    def display(self, text):
+        print text
 
-    def display_invalid_choice(self, decision):
-        pass
+    @property
+    def is_in_progress(self):
+        return bool(self.__current_decision or self.__current_consumer_package)
 
-    def display_please_select(self, decision):
-        pass
-
-    def display_choices(self, decision):
-        pass
-
-    def get_choice_from_player(self, decision):
-        return self.choice_queue.get()
-
-    def is_valid_choice(self, decision, choice):
-        assert isinstance(decision, PythonDecision)
-        return bool(choice in decision.valid_choices)
-
-    def get_decision(self):
-        return self.decision_queue.get()
+    def get_next_screen(self):
+        if not self.is_in_progress:
+            screen = self.game.get_state()
+            events = self.game.do_screen(screen)
+            # default choices is always go back.. unless there are others
+            choices = [game_code.interactions.lib.choices.ChoiceBack()]
+            if screen.choices:
+                enabled_choices = self.game.parse_choices(screen.choices)
+                if enabled_choices:
+                    choices = enabled_choices
+            # make a decision with the choices available
+            decision = self.create_decision(
+                prompt=screen.prompt,
+                choices=choices,
+                **screen.kwargs
+            )
+            self.__current_decision = decision
+            # make a package to display to the consumer
+            consumer_package = ConsumerPackage(
+                pid=decision.prompt_id,
+                title=screen.title,
+                text=screen.text,
+                prompt=screen.prompt,
+                choices=decision.choice_display,
+                events=events,
+            )
+            self.__current_consumer_package = consumer_package
+        return self.__current_consumer_package
 
     def put_choice(self, choice):
-        self.choice_queue.put(choice)
+        try:
+            self.__current_decision.set_choice(choice)
+        except exceptions.GameInvalidChoice:
+            return False
+        else:
+            self.game.handle_choice(self.__current_decision.choice)
+            self.reset_status()
+            return True

@@ -22,24 +22,12 @@ class Decision(object):
         self.kwargs = kwargs
         super(Decision, self).__init__()
 
-    def get_decision(self):
-        raise NotImplementedError()
-
-    def initial_display(self):
-        self.interface.display(self.prompt)
-        self.interface.display_please_select(self)
-
-    def show_choices(self):
-        if self.repeat_choices_on_bad_choice:
-            self.interface.display_choices(self)
-
-    def prompt_for_choice(self):
-        choice = self.interface.get_choice_from_player(self)
-        if self.interface.is_valid_choice(self, choice):
-            self.set_choice(choice)
-
     def set_choice(self, choice):
         self.choice = choice
+
+    def add_choice(self, choice, choice_key=None):
+        """for debugging or cheats via choice_hook"""
+        raise NotImplementedError()
 
 
 class Interface(object):
@@ -47,42 +35,19 @@ class Interface(object):
     decision_class = Decision
 
     def __init__(self, menu_choices=None):
+        self.game = None
         self.promp_id = itertools.count()
         self.menu_choices = menu_choices
         super(Interface, self).__init__()
 
+    def attach_game(self, game):
+        self.game = game
+
+    def start(self):
+        raise NotImplementedError()
+
     def get_next_prompt_id(self):
         return self.promp_id.next()
 
-    def display_screen(self, screen):
-        raise NotImplementedError()
-
-    def display_menu(self, menu):
-        raise NotImplementedError()
-
-    @staticmethod
-    def display(text):
-        raise NotImplementedError()
-
-    def display_invalid_choice(self, decision):
-        raise NotImplementedError()
-
-    def display_please_select(self, decision):
-        raise NotImplementedError()
-
-    def display_choices(self, decision):
-        raise NotImplementedError()
-
-    def prompt_for_choice(self, prompt, choices, **kwargs):
-        prompt_id = self.get_next_prompt_id()
-        log.debug('pfc - start: id={} prompt={} choices={} kwargs={}'.format(prompt_id, prompt, choices, kwargs))
-        decision = self.decision_class(self, prompt_id, prompt, choices, **kwargs)
-        choice = decision.get_decision()
-        log.debug('pfc - finish: id={} choice={}'.format(prompt_id, choice))
-        return choice
-
-    def get_choice_from_player(self, decision):
-        raise NotImplementedError()
-
-    def is_valid_choice(self, decision, choice):
-        raise NotImplementedError()
+    def create_decision(self, prompt, choices, **kwargs):
+        return self.decision_class(self, self.get_next_prompt_id(), prompt, choices, **kwargs)

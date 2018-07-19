@@ -1,1 +1,3 @@
 import adventure
+import test_adventure
+import game_code

@@ -4,6 +4,13 @@ from game_code import core
 log = logging.getLogger('interactions.events')
 
 
+class Result(object):
+
+    def __init__(self, text):
+        self.text = text
+        super(Result, self).__init__()
+
+
 class Event(object):
     """
     an event is how the game makes stuff happen, an evnt will add items to play inventory, or journal entries
@@ -16,9 +23,11 @@ class Event(object):
     def do_event(self, game):
         if self.already_triggered and not self.can_trigger_multiple_times:
             pass  # do nothing, already triggered
+            result = None
         else:
-            self._do_event(game)
+            result = self._do_event(game)
         self.already_triggered = True
+        return result
 
     def _do_event(self, game):
         raise NotImplementedError()
@@ -33,6 +42,7 @@ class AddItem(Event):
 
     def _do_event(self, game):
         game.player.inventory.add_item(self.item)
+        return Result('Added an item to your Inventory: {}'.format(self.item.name))
 
 
 class RemoveItem(Event):
@@ -44,6 +54,7 @@ class RemoveItem(Event):
 
     def _do_event(self, game):
         game.player.inventory.remove_item(self.item)
+        return Result('Removed an item from your Inventory: {}'.format(self.item.name))
 
 
 class UnlockJournal(Event):
@@ -55,6 +66,7 @@ class UnlockJournal(Event):
 
     def _do_event(self, game):
         game.player.journal.add_entry(self.entry)
+        return Result('New entry in your Journal: {} '.format(self.entry.name))
 
 
 class ConditionalUnlockJournal(Event):
