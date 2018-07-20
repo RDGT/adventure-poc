@@ -28,7 +28,7 @@ You must have Python installed, (tested with version 2.7.11)
 
 ## Running tests and logging and debugging
 
- - There is a test script `test-adventure.py` (not implemented yet)
+ - There is a test script `test_adventure.py` (in progress, partial coverage)
  - There is basic logging. use `--log` to enable logging, and `--log-file` to specify a file to write logs to.
  - You can enable debug mode by launching the game with `--debug` or by writing `debug-mode` at any choice prompt. 
 
@@ -46,7 +46,7 @@ However, if you would like to contribute please feel free to fork and make a pul
 ## Authors / Creators / Credits
 
 * **Inbar Rose** - *Code Master and Architect* - [InbarRose](https://github.com/InbarRose)
-* **Alon Cang** - *Game Design and Text* - [InbarRose](https://github.com/AlonCang)
+* **Alon Cang** - *Game Design and Text* - [AlonCang](https://github.com/AlonCang)
 
 ## License
 
