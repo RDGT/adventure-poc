@@ -30,6 +30,7 @@ class Game(object):
         self.levels = {}
         # operation
         self.operating = False
+        self.the_end = None
         # navigation | menu
         self.menu_enter_location = None
         # navigation | screen
@@ -227,8 +228,7 @@ class Game(object):
         return choice_string
 
     def load_levels(self):
-        # level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
-        level_dirs = ['level_1', 'level_2']  # todo: this is just for the beginning so i don't need to do it all
+        level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
         for level_name in level_dirs:
             self.load_level(level_name)
 
@@ -255,6 +255,10 @@ class Game(object):
         self.previous_scene = self.current_scene = opening_scene
         self.previous_screen = self.current_screen = self.next_screen = opening_screen
 
+    def set_the_end(self, ending_text):
+        self.the_end = ending_text
+        self.operating = False
+
     def start_game(self):
         self.set_opening_screen()
         self.operating = True
@@ -262,7 +266,13 @@ class Game(object):
 
     def get_state(self):
         """gets the 'state' of the game, what the screen should be"""
-        return self.next_screen
+        if not self.operating:
+            if self.the_end is not None:
+                raise core.exceptions.GameOverException(self.the_end)
+            else:
+                raise core.exceptions.GameNotOperating()
+        else:
+            return self.next_screen
 
 
 def start_game(*args, **kwargs):

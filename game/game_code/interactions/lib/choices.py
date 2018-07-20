@@ -180,3 +180,9 @@ class ChoiceInspectRoom(Choice):
         scene = game.current_room.get_scene(self.scene)
         game.change_scene(scene)
         game.next_screen = scene.get_current_screen()
+
+
+class ChoiceTheEnd(Choice):
+
+    def _make_choice(self, game):
+        game.set_the_end(self.text)
