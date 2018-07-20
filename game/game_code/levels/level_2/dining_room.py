@@ -45,7 +45,7 @@ dining_room = interactions.room.Room(
                                           conditions=[conditions.OnlyOnce(), conditions.GameFlagTrue('robert')]),
             ],
         ),
-        'shadow_combat': interactions.combat.Combat(
+        'shadow_combat': interactions.thing.Thing(
             name='Combat with Shadow',
             opening_text='The shadow wails an echoing shriek!',
             choices=[

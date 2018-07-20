@@ -31,7 +31,7 @@ grande_hall = interactions.room.Room(
     },
     scenes={
         # ghoul scenes
-        'attack': interactions.combat.Combat(
+        'attack': interactions.thing.Thing(
             name='Combat with Ghoul',
             opening_text='Choose your weapon',
             choices=[

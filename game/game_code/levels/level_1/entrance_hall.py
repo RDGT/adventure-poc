@@ -8,9 +8,9 @@ entrance_hall = interactions.room.Room(
                  'The air is moldy and the floor is covered with dust.\n'
                  'There are three doors leading away from the hall.',
     choices=[
-        choices.ChoiceNavigate('Left door', level='level_1', room='closet_room'),
-        choices.ChoiceNavigate('Front door', level='level_1', room='living_room'),
-        choices.ChoiceNavigate('Right door', level='level_1', room='kitchen'),
+        choices.ChoiceNavigate('Left Door', level='level_1', room='closet_room'),
+        choices.ChoiceNavigate('Front Door', level='level_1', room='living_room'),
+        choices.ChoiceNavigate('Right Door', level='level_1', room='kitchen'),
     ],
     events=[events.UnlockJournal(entry.cursed_dungeon)],
 )

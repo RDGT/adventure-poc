@@ -1,7 +1,7 @@
 import os
 import logging
 import objects
-from interface import terminal_interface
+from interface import terminal_interface, python_interface
 from interactions.lib import choices, conditions, events
 from objects import item, entry
 import core
@@ -14,11 +14,16 @@ class Game(object):
     main game object, holds everything.
     """
 
-    def __init__(self):
+    def __init__(self, *args):
+        self.args = args  # for future use?
         # components
         self.level_dir = core.levels_dir
         self.player = None
         self.interface = None
+        self._interface_map = {
+            'terminal': self.set_terminal_interface,
+            'python': self.set_python_interface,
+        }
         # flag holder
         self.game_flags = {}
         # level holder
@@ -58,12 +63,12 @@ class Game(object):
         self.player = objects.player.Player()
         self.player.attach_game(self)
         # starting items
-        self.player.inventory.add_item(item.crossbow, display=False)
-        self.player.inventory.add_item(item.holy_cross, display=False)
-        self.player.inventory.add_item(item.holy_water, display=False)
-        self.player.inventory.add_item(item.flammable_oil, display=False)
+        self.player.inventory.add_item(item.crossbow)
+        self.player.inventory.add_item(item.holy_cross)
+        self.player.inventory.add_item(item.holy_water)
+        self.player.inventory.add_item(item.flammable_oil)
         # starting journal
-        self.player.journal.add_entry(entry.equipped, display=False)
+        self.player.journal.add_entry(entry.equipped)
 
     def set_terminal_interface(self):
         interface = terminal_interface.TerminalInterface(
@@ -72,7 +77,19 @@ class Game(object):
         )
         self._set_interface(interface)
 
+    def set_python_interface(self):
+        interface = python_interface.PythonInterface(
+            menu_choices=[choices.ChoiceInventory(), choices.ChoiceJournal()],
+            # choice_hook=self._choice_hook
+        )
+        self._set_interface(interface)
+
+    def set_interface(self, interface_type='terminal'):
+        interface_init_func = self._interface_map[interface_type]
+        interface_init_func()
+
     def _set_interface(self, interface):
+        interface.attach_game(self)
         self.interface = interface
 
     def change_screen(self, screen):
@@ -97,10 +114,9 @@ class Game(object):
 
     def do_screen(self, screen):
         self.change_screen(screen)
-        self.interface.display_screen(screen)
         screen.set_seen()
-        self.handle_screen_events(screen)
-        self.handle_screen_choices(screen)
+        events_that_happened = self.handle_screen_events(screen)
+        return events_that_happened
 
     def do_menu(self, menu):
         menu_scene = menu.generate_menu_scene()
@@ -108,21 +124,25 @@ class Game(object):
 
     def handle_screen_events(self, screen):
         if not screen.events:
-            return
+            return None
+        events_that_happened = []
         for event in screen.events:
-            self.handle_event(event)
+            event_result = self.handle_event(event)
+            if event_result is not None:
+                events_that_happened.append(event_result)
+        return events_that_happened
 
     def handle_event(self, event):
         log.debug('handling event: event={}'.format(event))
-        event.do_event(self)
+        return event.do_event(self)
 
-    def parse_choices(self, choice_list):
+    def parse_choices(self, choice_list, return_all=False):
         """parses choices, enabling or disabling choices based on conditions"""
         return_list = []
         for choice in choice_list:
             if choice.conditions:
                 self.handle_choice_conditions(choice)
-            if choice.enabled:
+            if choice.enabled or return_all:
                 return_list.append(choice)
 
         return return_list
@@ -167,22 +187,6 @@ class Game(object):
                 log.error('invalid action for condition: action={} condition={}'.format(action, condition))
                 raise core.exceptions.GameRunTimeException('invalid action for condition: {}'.format(action))
         return modifier
-
-    def handle_screen_choices(self, screen):
-        choice = None
-        if screen.choices:
-            enabled_choices = self.parse_choices(screen.choices)
-            if enabled_choices:
-                # get the choice from the choices on the screen
-                choice = self.interface.prompt_for_choice(
-                    prompt=screen.prompt,
-                    choices=enabled_choices,
-                    **screen.kwargs
-                )
-        if choice is None:
-            # if no choices are set on the screen, default to a "go back" choice
-            choice = choices.ChoiceBack()
-        self.handle_choice(choice)
 
     def handle_choice(self, choice):
         log.debug('handling choice: choice={}'.format(choice))
@@ -238,7 +242,7 @@ class Game(object):
         self.add_new_level(level_name, level_class)
 
     def add_new_level(self, level_name, level_class):
-        level = level_class()
+        level = level_class(name=level_name)
         level.attach_game(self)
         level.load_rooms()
         self.levels[level_name] = level
@@ -254,24 +258,17 @@ class Game(object):
     def start_game(self):
         self.set_opening_screen()
         self.operating = True
-        self.main_game_loop()
-        self.operating = False
+        self.interface.start()
 
-    def main_game_loop(self):
-        while self.operating:
-            try:
-                self.do_game_cycle()
-            except core.exceptions.GameRunTimeException as grte:
-                log.error('Error in main game loop: grte={}'.format(grte))
-                raise
-
-    def do_game_cycle(self):
-        self.do_screen(self.next_screen)
+    def get_state(self):
+        """gets the 'state' of the game, what the screen should be"""
+        return self.next_screen
 
 
-def start_game(*args):
-    game = Game()
+def start_game(*args, **kwargs):
+    game = Game(*args)
     game.add_player()
-    game.set_terminal_interface()
+    game.set_interface(kwargs.get('interface', 'terminal'))
     game.load_levels()
     game.start_game()
+    return game

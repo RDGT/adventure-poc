@@ -32,9 +32,6 @@ class Screen(object):
     def update_choice(self, choice):
         self.choice = choice
 
-    def do_screen(self):
-        self.game.do_scene(self)
-
 
 class Scene(object):
 

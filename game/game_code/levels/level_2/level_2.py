@@ -2,7 +2,7 @@ from game_code.interactions import level
 from game_code.levels.level_2 import dining_room, grande_hall, library, laboratory, bedroom, statue_room
 
 
-class level_2(level.BasicLevel):
+class level_2(level.Level):
 
     def get_first_scene(self):
         return self.rooms['grande_hall']

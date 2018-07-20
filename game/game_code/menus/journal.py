@@ -14,10 +14,9 @@ class Journal(menu.Menu):
     def menu_items(self):
         return self.entries
 
-    def add_entry(self, entry, display=True):
+    def add_entry(self, entry):
         if entry in self.entries:
             log.warn('entry to add already exists, skip adding again: entry={}'.format(entry))
             return
-        if display:
-            self.game.interface.display('* New entry in your Journal: {} '.format(entry.name))
+        log.debug('adding journal entry: entry={}'.format(entry.name))
         self.entries.append(entry)

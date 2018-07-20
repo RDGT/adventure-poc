@@ -3,7 +3,8 @@ from lib import area
 
 class Level(area.Area):
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.rooms = {}
         super(Level, self).__init__()
 
@@ -12,7 +13,8 @@ class Level(area.Area):
 
     def load_room(self, room_key, room_instance):
         """should add the room_instance to the self.rooms dict using room_key"""
-        raise NotImplementedError()
+        room_instance.attach_game(self.game)
+        self.rooms[room_key] = room_instance
 
     def load_rooms(self):
         """should load all rooms in this level and attach game"""
@@ -23,10 +25,3 @@ class Level(area.Area):
         if item in self.rooms:
             return self.rooms[item]
         super(Level, self).__getattr__(item)
-
-
-class BasicLevel(Level):
-
-    def load_room(self, room_key, room_instance):
-        room_instance.attach_game(self.game)
-        self.rooms[room_key] = room_instance

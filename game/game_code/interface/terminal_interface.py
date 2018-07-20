@@ -19,6 +19,40 @@ class TerminalDecision(abstract_interface.Decision):
         self.choice_display = choice_display
         super(TerminalDecision, self).__init__(interface, decision_id, prompt, choices, **kwargs)
 
+    def initial_display(self):
+        self.interface.display(self.prompt)
+        self.interface.display_please_select(self)
+
+    def show_choices(self):
+        if self.repeat_choices_on_bad_choice:
+            self.interface.display_choices(self)
+
+    def prompt_for_choice(self):
+        choice = self.interface.get_choice_from_player(self)
+        if self.is_valid_choice(choice):
+            self.set_choice(choice)
+
+    def get_decision(self):
+        self.initial_display()
+        while True:
+            self.prompt_for_choice()
+            if self.choice:
+                return self.choice
+            log.debug('no valid choice selected yet')
+            self.show_choices()
+
+    def is_valid_choice(self, choice):
+        valid = bool(choice in self.valid_choices)
+        if valid:
+            return True
+        elif choice.isalpha():
+            if choice.isupper():
+                return bool(choice.lower() in self.valid_choices)
+            else:
+                return bool(choice.upper() in self.valid_choices)
+        else:
+            return False
+
     @property
     def valid_choices(self):
         return self.choice_map.keys()
@@ -82,6 +116,10 @@ class TerminalInterface(abstract_interface.Interface):
         self.display('==[ {} ]=='.format(screen.title))
         self.display(screen.text + '\n')
 
+    def display_event_results(self, event_results):
+        for event_result in event_results:
+            self.display('* {}'.format(event_result.text))
+
     def add_white_space(self):
         self.display('\n\n')
 
@@ -109,15 +147,39 @@ class TerminalInterface(abstract_interface.Interface):
             choice = self.choice_hook(choice, decision)
         return choice
 
-    def is_valid_choice(self, decision, choice):
-        assert isinstance(decision, TerminalDecision)
-        valid = bool(choice in decision.valid_choices)
-        if valid:
-            return True
-        elif choice.isalpha():
-            if choice.isupper():
-                return bool(choice.lower() in decision.valid_choices)
-            else:
-                return bool(choice.upper() in decision.valid_choices)
-        else:
-            return False
+    def do_screen(self, screen):
+        self.display_screen(screen)
+        event_results = self.game.do_screen(screen)
+        if event_results:
+            self.display_event_results(event_results)
+        choice = None
+        if screen.choices:
+            enabled_choices = self.game.parse_choices(screen.choices)
+            if enabled_choices:
+                # get the choice from the choices on the screen
+                choice = self.prompt_for_choice(
+                    prompt=screen.prompt,
+                    choices=enabled_choices,
+                    **screen.kwargs
+                )
+        if choice is None:
+            # if no choices possible, default to a "go back" choice
+            choice = game_code.interactions.lib.choices.ChoiceBack()
+        self.game.handle_choice(choice)
+
+    def prompt_for_choice(self, prompt, choices, **kwargs):
+        decision = self.create_decision(prompt, choices, **kwargs)
+        log.debug('pfc - start: id={} prompt={} choices={} kwargs={}'.format(
+            decision.prompt_id, prompt, choices, kwargs))
+        choice = decision.get_decision()
+        log.debug('pfc - finish: id={} choice={}'.format(
+            decision.prompt_id, choice))
+        return choice
+
+    def start(self):
+        while self.game.operating:
+            try:
+                self.do_screen(self.game.get_state())
+            except exceptions.GameRunTimeException as grte:
+                log.error('Error in main game loop: grte={}'.format(grte))
+                raise
