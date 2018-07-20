@@ -8,6 +8,14 @@ class GameInvalidChoice(GameRunTimeException):
     pass
 
 
+class GameOverException(GameRunTimeException):
+    pass
+
+
+class GameNotOperating(GameRunTimeException):
+    pass
+
+
 class GameLoadClassException(GameRunTimeException):
     pass
 

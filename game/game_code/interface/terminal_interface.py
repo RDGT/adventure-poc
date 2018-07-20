@@ -58,7 +58,7 @@ class TerminalDecision(abstract_interface.Decision):
         return self.choice_map.keys()
 
     def set_choice(self, choice):
-        self.interface.add_white_space()
+        self.interface.display_white_space()
         choice_obj = self.choice_map.get(choice, None)
         if choice_obj is None and choice.isalpha():
             if choice.isupper():
@@ -120,7 +120,7 @@ class TerminalInterface(abstract_interface.Interface):
         for event_result in event_results:
             self.display('* {}'.format(event_result.text))
 
-    def add_white_space(self):
+    def display_white_space(self):
         self.display('\n\n')
 
     @staticmethod
@@ -183,3 +183,7 @@ class TerminalInterface(abstract_interface.Interface):
             except exceptions.GameRunTimeException as grte:
                 log.error('Error in main game loop: grte={}'.format(grte))
                 raise
+        if self.game.the_end is not None:
+            self.display(self.game.the_end)
+            self.display_white_space()
+            self.display('THE END')

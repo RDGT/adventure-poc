@@ -97,7 +97,12 @@ class PythonInterface(abstract_interface.Interface):
         return bool(self.__current_decision or self.__current_consumer_package)
 
     def get_next_screen(self):
-        if not self.is_in_progress:
+        if not self.game.operating:
+            if self.game.the_end is not None:
+                consumer_package = ConsumerPackage(-1, 'THE END', self.game.the_end, None, None, None)
+                self.__current_consumer_package = consumer_package
+            raise exceptions.GameNotOperating()
+        elif not self.is_in_progress:
             screen = self.game.get_state()
             events = self.game.do_screen(screen)
             # default choices is always go back.. unless there are others
