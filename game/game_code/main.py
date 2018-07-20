@@ -241,7 +241,7 @@ class Game(object):
         self.add_new_level(level_name, level_class)
 
     def add_new_level(self, level_name, level_class):
-        level = level_class()
+        level = level_class(name=level_name)
         level.attach_game(self)
         level.load_rooms()
         self.levels[level_name] = level

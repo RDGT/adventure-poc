@@ -39,7 +39,7 @@ statue_room = interactions.room.Room(
             events=[events.SetRoomScreen('clear')]
         ),
         # == fight the Gargoyle ==
-        'fight1': interactions.combat.Combat(
+        'fight1': interactions.thing.Thing(
             name='Gargoyle attacks!',
             opening_text='You have only a fraction of a second to respond!',
             choices=[
@@ -55,7 +55,7 @@ statue_room = interactions.room.Room(
                                           conditions=[conditions.PlayerHasItem(item.nitro)]),
             ],
         ),
-        'fight2': interactions.combat.Combat(
+        'fight2': interactions.thing.Thing(
             name='Combat with Gargoyle',
             opening_text='Defeating this monstrous stone construct will be no easy feat.',
             choices=[

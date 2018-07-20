@@ -1,0 +1,17 @@
+{
+  "type": "story_config",
+  "story_name": "Cursed Dungeon",
+  "starting_location": {
+    "level_name": "level_1",
+    "room_name": "outside",
+  },
+  "starting_items": [
+    "crossbow",
+    "holy_cross",
+    "holy_water",
+    "flammable_oil"
+  ],
+  "starting_entries": [
+    "equipped"
+  ]
+}

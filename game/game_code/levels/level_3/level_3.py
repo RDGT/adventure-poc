@@ -1,8 +1,11 @@
 from game_code.interactions import level
-from game_code.levels.level_1 import outside
+from game_code.levels.level_3 import *
 
 
 class level_3(level.Level):
 
     def get_first_scene(self):
-        return outside.outside.run_scene(self.game)
+        pass
+
+    def load_rooms(self):
+        pass

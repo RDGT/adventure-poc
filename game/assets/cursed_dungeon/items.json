@@ -1,0 +1,21 @@
+{
+  "type": "items",
+  "items": {
+    "crossbow": {
+      "name": "Crossbow",
+      "description": "Your trusty crossbow"
+    },
+    "holy_cross": {
+      "name": "Holy Cross",
+      "description": "Your Holy Cross"
+    },
+    "holy_water": {
+      "name": "Holy Water",
+      "description": "A vial of Holy Water"
+    },
+    "flammable_oil": {
+      "name": "Flammable Oil",
+      "description": "A vial of Flammable Oil"
+    }
+  }
+}
