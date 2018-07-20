@@ -184,5 +184,8 @@ class ChoiceInspectRoom(Choice):
 
 class ChoiceTheEnd(Choice):
 
+    def __init__(self, text, **kwargs):
+        super(ChoiceTheEnd, self).__init__(text, hidden=True, **kwargs)
+
     def _make_choice(self, game):
         game.set_the_end(self.text)

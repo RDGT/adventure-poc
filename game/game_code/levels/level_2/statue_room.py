@@ -110,7 +110,6 @@ statue_room = interactions.room.Room(
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
-            events=[events.RemoveItem(item.holy_cross)]
         ),
         'fight_water': interactions.thing.Thing(
             name='Gargoyle attacks!',
@@ -129,7 +128,7 @@ statue_room = interactions.room.Room(
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
-            events=[events.RemoveItem(item.holy_cross)]
+            events=[events.RemoveItem(item.holy_water)]
         ),
         'fight_fire': interactions.thing.Thing(
             name='Gargoyle attacks!',
@@ -148,7 +147,7 @@ statue_room = interactions.room.Room(
                 choices.ChoiceNavigate('Retreat to the Grande Hall', level='level_2', room='grande_hall',
                                        scene='gargoyle_fight')
             ],
-            events=[events.RemoveItem(item.holy_cross)]
+            events=[events.RemoveItem(item.flammable_oil)]
         ),
         'fight_nitro': interactions.thing.Thing(
             name='Gargoyle attacks!',
@@ -170,7 +169,7 @@ statue_room = interactions.room.Room(
                                        conditions=[conditions.RoomFlagFalse('retreated')]),
                 choices.ChoiceBackToRoom('Back to the Statue Room', conditions=[conditions.RoomFlagTrue('retreated')]),
             ],
-            events=[events.RemoveItem(item.holy_cross), events.SetRoomScreen('clear')]
+            events=[events.SetRoomScreen('clear')]
         )
     }
 )
