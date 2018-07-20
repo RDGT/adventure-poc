@@ -128,7 +128,8 @@ class Game(object):
         events_that_happened = []
         for event in screen.events:
             event_result = self.handle_event(event)
-            events_that_happened.append(event_result)
+            if event_result is not None:
+                events_that_happened.append(event_result)
         return events_that_happened
 
     def handle_event(self, event):

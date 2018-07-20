@@ -36,7 +36,7 @@ statue_room = interactions.room.Room(
                 choices.ChoiceNavigate('Descend through the stone arch', level='level_3', room='temple_room'),
                 choices.ChoiceNavigate('Go back to the Grande Hall', level='level_2', room='grande_hall'),
             ],
-            events=[events.SetRoomScreen('clear')]
+            events=[events.SetRoomScreen('clear'), events.RemoveItem(item.head)]
         ),
         # == fight the Gargoyle ==
         'fight1': interactions.thing.Thing(
