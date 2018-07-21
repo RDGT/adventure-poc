@@ -13,15 +13,21 @@ class Result(object):
 
 class Event(object):
     """
-    an event is how the game makes stuff happen, an evnt will add items to play inventory, or journal entries
+    an event is how the game makes stuff happen, an event will add items to player inventory, or journal entries
+    an event can toggle room or game variables
+    an event could have conditions
     """
     def __init__(self, **kwargs):
         self.already_triggered = False
         self.can_trigger_multiple_times = kwargs.pop('can_trigger_multiple_times', False)
+        self.conditions = kwargs.pop('conditions', [])
         super(Event, self).__init__()
 
     def do_event(self, game):
-        if self.already_triggered and not self.can_trigger_multiple_times:
+        if self.conditions and game.check_conditions(self.conditions) == -1:
+            pass  # do nothing, conditions not met
+            result = None
+        elif self.already_triggered and not self.can_trigger_multiple_times:
             pass  # do nothing, already triggered
             result = None
         else:
@@ -67,22 +73,6 @@ class UnlockJournal(Event):
     def _do_event(self, game):
         game.player.journal.add_entry(self.entry)
         return Result('New entry in your Journal: {} '.format(self.entry.name))
-
-
-class ConditionalUnlockJournal(Event):
-    """unlocks a journal entry depending on the first condition met"""
-
-    def __init__(self, condition_entry_tuples, **kwargs):
-        self.condition_entry_tuples = condition_entry_tuples
-        super(ConditionalUnlockJournal, self).__init__(**kwargs)
-
-    def _do_event(self, game):
-        for condition, entry in self.condition_entry_tuples:
-            if condition.check_condition(game) in (1, 0):
-                game.player.journal.add_entry(entry)
-                break
-        else:
-            log.warn('no condition met for ConditionalUnlockJournal')
 
 
 class SetRoomScreen(Event):

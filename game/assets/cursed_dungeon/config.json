@@ -1,5 +1,5 @@
 {
-  "type": "story_config",
+  "type": "config",
   "story_name": "Cursed Dungeon",
   "starting_location": {
     "level_name": "level_1",

@@ -10,11 +10,12 @@ class Adventure(object):
 
     def __init__(self, **kwargs):
         self.debug_mode = kwargs.pop('debug_mode', False)
+        self.kwargs = kwargs
         super(Adventure, self).__init__()
 
     def play(self, *args):
         log.info('starting to play the Adventure game!')
-        return game_code.main.start_game(*args)
+        return game_code.main.start_game(*args, **self.kwargs)
 
 
 def main(args):
@@ -27,6 +28,8 @@ def main(args):
                       action='store_true', default=False)
     parser.add_option('--log-file', dest='log_file',
                       help='log to specified file location')
+    parser.add_option('--story', dest='story',
+                      help='The story to play (leave blank for default)')
     options, args = parser.parse_args(args)
 
     if options.log:
