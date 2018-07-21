@@ -1,9 +1,9 @@
-from game_code import interactions
-from game_code import objects
+from game_code import interactions, objects, core
 from collections import namedtuple
+import logging
 
+log = logging.getLogger('asset_loader.base')
 
-RoomAsset = namedtuple('RoomAsset', 'level_id room_object')
 StoryStart = namedtuple('StoryStart', 'level_id room_id')
 
 
@@ -21,8 +21,17 @@ class AssetBase(object):
         self.starting_entries = []
         super(AssetBase, self).__init__()
 
-    def generate_story(self):
-        """combine all the rooms and levels together into a story"""
+    def generate_story(self, game):
+        """combine all the rooms and levels together into a story and give it to the game"""
+        for level_id, level in self.levels.items():
+            game.add_new_level(level_id, self._gen_level(level))
+        game.set_opening_screen(self.story_start.level_id, self.story_start.room_id)
+
+    def _gen_level(self, level):
+        for room_id in level.rooms.keys():
+            if room_id not in self.rooms:
+                raise core.exceptions.AssetNotLoaded(room_id)
+            level.add_room(room_id, self.rooms[room_id])
 
     def set_meta(self, meta_key, meta_value, **kwargs):
         self.meta[meta_key] = meta_value
@@ -33,25 +42,21 @@ class AssetBase(object):
     def set_story_name(self, story_name):
         self.story_name = story_name
 
-    def add_level(self, level_id, name):
-        if level_id not in self.levels:
-            level = interactions.level.Level(name=name)
-            self.levels[level_id] = level
-        return self.levels[level_id]
+    def add_level(self, level_id, level_name, rooms):
+        level = interactions.level.Level(name=level_name, rooms=rooms)
+        self.levels[level_id] = level
 
-    def add_room(self, level_id, room_id, name, opening_text, choices, **kwargs):
+    def add_room(self, room_id, room_name, opening_text, choices, **kwargs):
         room_object = interactions.room.Room(
-            name=name,
+            name=room_name,
             opening_text=opening_text,
             choices=choices,
             **kwargs
         )
-        room_key = '{}.{}'.format(level_id, room_id)
-        self.rooms[room_key] = RoomAsset(level_id, room_object)
+        self.rooms[room_id] = room_object
 
-    def add_item(self, item_id, item_name, item_description, **kwargs):
-        self.items[item_id] = objects.item.Item(item_name, item_description, **kwargs)
+    def add_item(self, item_id, name, description, **kwargs):
+        self.items[item_id] = objects.item.Item(name, description, **kwargs)
 
-    def add_entry(self, entry_id, entry_name, entry_description, **kwargs):
-        self.entries[entry_id] = objects.item.Item(entry_name, entry_description, **kwargs)
-
+    def add_entry(self, entry_id, name, description, **kwargs):
+        self.entries[entry_id] = objects.item.Item(name, description, **kwargs)

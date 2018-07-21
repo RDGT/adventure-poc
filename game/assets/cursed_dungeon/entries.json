@@ -4,6 +4,15 @@
     "equipped": {
       "name": "I am equipped and ready",
       "description": "I am equipped and ready to enter the cursed dungeon, I wonder what evil lurks within."
+    },
+    "cursed_dungeon": {
+      "name": "I have entered the Cursed Dungeon",
+      "description": "I have entered this cursed dungeon, I wonder what evil lurks within."
+    },
+    "found_a_key": {
+      "name": "An Iron Key",
+      "description": "I have found a key. Now where is the lock?"
     }
+
   }
 }

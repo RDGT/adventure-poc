@@ -1,0 +1,12 @@
+{
+  "type": "level",
+  "level_id": "level_1",
+  "level_name": "Level One",
+  "rooms": [
+    "outside",
+    "entrance_hall",
+    "closet_room",
+    "kitchen",
+    "living_room"
+  ]
+}

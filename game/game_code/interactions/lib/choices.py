@@ -42,19 +42,13 @@ class Choice(object):
         raise NotImplementedError()
 
 
-class ChoiceBack(Choice):
+class ChoiceGoBack(Choice):
     """returns to previous screen/scene"""
     def __init__(self, text='Go back.', **kwargs):
-        super(ChoiceBack, self).__init__(text, **kwargs)
+        super(ChoiceGoBack, self).__init__(text, **kwargs)
 
     def _make_choice(self, game):
         game.next_screen = game.previous_screen
-
-
-class ChoiceNext(Choice):
-    """go to next screen (for dialogue/long text)"""
-    def __init__(self, text='Next', **kwargs):
-        super(ChoiceNext, self).__init__(text, **kwargs)
 
 
 class ChoiceEnableDebugMode(Choice):
@@ -185,7 +179,8 @@ class ChoiceInspectRoom(Choice):
 class ChoiceTheEnd(Choice):
 
     def __init__(self, text, **kwargs):
-        super(ChoiceTheEnd, self).__init__(text, hidden=True, **kwargs)
+        self.ending_text = text
+        super(ChoiceTheEnd, self).__init__(text='THE END', **kwargs)
 
     def _make_choice(self, game):
-        game.set_the_end(self.text)
+        game.set_the_end(self.ending_text)

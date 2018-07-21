@@ -106,7 +106,7 @@ class PythonInterface(abstract_interface.Interface):
             screen = self.game.get_state()
             events = self.game.do_screen(screen)
             # default choices is always go back.. unless there are others
-            choices = [game_code.interactions.lib.choices.ChoiceBack()]
+            choices = [game_code.interactions.lib.choices.ChoiceGoBack()]
             if screen.choices:
                 enabled_choices = self.game.parse_choices(screen.choices)
                 if enabled_choices:

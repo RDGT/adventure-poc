@@ -164,7 +164,7 @@ class TerminalInterface(abstract_interface.Interface):
                 )
         if choice is None:
             # if no choices possible, default to a "go back" choice
-            choice = game_code.interactions.lib.choices.ChoiceBack()
+            choice = game_code.interactions.lib.choices.ChoiceGoBack()
         self.game.handle_choice(choice)
 
     def prompt_for_choice(self, prompt, choices, **kwargs):

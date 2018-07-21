@@ -4,6 +4,7 @@ import objects
 from interface import terminal_interface, python_interface
 from interactions.lib import choices, conditions, events
 from objects import item, entry
+import asset_loader
 import core
 
 log = logging.getLogger('game')
@@ -227,10 +228,20 @@ class Game(object):
         # return choice string
         return choice_string
 
-    def load_levels(self):
-        level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
-        for level_name in level_dirs:
-            self.load_level(level_name)
+    def load_story(self, story=None):
+        if story is None:
+            log.info('loading story from internal code')
+            # load levels internally from code
+            level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
+            for level_name in level_dirs:
+                self.load_level(level_name)
+            self.set_opening_screen('level_1', 'outside')
+        else:
+            log.info('loading story from assets: story={}'.format(story))
+            # load levels using asset loader
+            loader = asset_loader.JsonParser()
+            loader.load_story(story)
+            loader.generate_story(self)
 
     def load_level(self, level_name):
         """
@@ -238,18 +249,16 @@ class Game(object):
         loads levels from python files (for now)
         """
         level_file_path = '{}.py'.format(os.path.join(self.level_dir, level_name, level_name))
-        level_class = core.load_class_from_file(level_file_path, level_name)
-        self.add_new_level(level_name, level_class)
+        level = core.load_variable_from_file(level_file_path, level_name)
+        self.add_new_level(level_name, level)
 
-    def add_new_level(self, level_name, level_class):
-        level = level_class(name=level_name)
+    def add_new_level(self, level_id, level):
         level.attach_game(self)
-        level.load_rooms()
-        self.levels[level_name] = level
+        self.levels[level_id] = level
 
-    def set_opening_screen(self):
-        opening_level = self.levels['level_1']
-        opening_scene = opening_level.get_first_scene()
+    def set_opening_screen(self, level_id, room_id):
+        opening_level = self.levels[level_id]
+        opening_scene = opening_level.rooms[room_id]
         opening_screen = opening_scene.get_first_screen()
         self.previous_level = self.current_level = opening_level
         self.previous_scene = self.current_scene = opening_scene
@@ -260,7 +269,6 @@ class Game(object):
         self.operating = False
 
     def start_game(self):
-        self.set_opening_screen()
         self.operating = True
         self.interface.start()
 
@@ -279,6 +287,6 @@ def start_game(*args, **kwargs):
     game = Game(*args)
     game.add_player()
     game.set_interface(kwargs.get('interface', 'terminal'))
-    game.load_levels()
+    game.load_story(kwargs.get('story'))
     game.start_game()
     return game

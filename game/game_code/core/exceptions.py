@@ -4,6 +4,10 @@ class GameRunTimeException(RuntimeError):
     pass
 
 
+class ParseAssetException(StandardError):
+    pass
+
+
 class GameInvalidChoice(GameRunTimeException):
     pass
 
@@ -16,7 +20,19 @@ class GameNotOperating(GameRunTimeException):
     pass
 
 
-class GameLoadClassException(GameRunTimeException):
+class LoadModuleException(GameRunTimeException):
+    pass
+
+
+class NoSuchParser(ParseAssetException):
+    pass
+
+
+class NoTypeSpecified(ParseAssetException):
+    pass
+
+
+class AssetNotLoaded(ParseAssetException):
     pass
 
 
@@ -24,11 +40,15 @@ class GameNavigateFailure(GameRunTimeException):
     pass
 
 
-class GameLibraryDoesNotExist(GameLoadClassException):
+class LoadLibraryDoesNotExist(LoadModuleException):
     pass
 
 
-class GameClassDoesNotExist(GameLoadClassException):
+class LoadClassDoesNotExist(LoadModuleException):
+    pass
+
+
+class LoadVariableDoesNotExist(LoadModuleException):
     pass
 
 

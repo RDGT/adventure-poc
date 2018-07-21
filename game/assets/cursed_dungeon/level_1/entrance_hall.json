@@ -1,0 +1,32 @@
+{
+  "type": "room",
+  "room_id": "entrance_hall",
+  "room_name": "Entrance Hall",
+  "opening_text": "Beyond the door is a circular wide room. The air is moldy and the floor is covered with dust. There are three doors leading away from the hall.",
+  "choices": [
+    {
+      "type": "ChoiceNavigate",
+      "text": "Left Door",
+      "level": "level_1",
+      "room": "closet_room"
+    },
+    {
+      "type": "ChoiceNavigate",
+      "text": "Front Door",
+      "level": "level_1",
+      "room": "living_room"
+    },
+    {
+      "type": "ChoiceNavigate",
+      "text": "Right Door",
+      "level": "level_1",
+      "room": "kitchen"
+    }
+  ],
+  "events": [
+    {
+      "type": "UnlockJournal",
+      "entry": "cursed_dungeon"
+    }
+  ]
+}

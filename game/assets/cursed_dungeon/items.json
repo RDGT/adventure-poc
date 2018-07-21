@@ -16,6 +16,26 @@
     "flammable_oil": {
       "name": "Flammable Oil",
       "description": "A vial of Flammable Oil"
+    },
+    "iron_key": {
+      "name": "Iron Key",
+      "description": "Iron Key found in the pocket of a leather coat in a closet"
+    },
+    "engagement_ring": {
+      "name": "Engagement Ring",
+      "description": "A ring found on a Zombie"
+    },
+    "nitro": {
+      "name": "Nitroglycerin",
+      "description": "You made a small vial of nitroglycerin"
+    },
+    "gem": {
+      "name": "Gem",
+      "description": "A ruby the size of your fist"
+    },
+    "head": {
+      "name": "Robert's Head",
+      "description": "A mummified head, with a note attached to the head that reads 'Robert'."
     }
   }
 }

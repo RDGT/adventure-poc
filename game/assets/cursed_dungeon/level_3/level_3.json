@@ -1,0 +1,9 @@
+{
+  "type": "level",
+  "level_id": "level_3",
+  "level_name": "Level Three",
+  "rooms": [
+    "temple_room",
+    "inner_cloister"
+  ]
+}
