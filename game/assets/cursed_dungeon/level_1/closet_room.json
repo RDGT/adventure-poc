@@ -1,0 +1,45 @@
+{
+  "type": "room",
+  "room_id": "closet_room",
+  "room_name": "Closet Room",
+  "opening_text": "The smell of wet leather fills the air. Before you are a few vacant coat hangers and a rotting wooden closet.",
+  "choices": [
+    {
+      "type": "ChoiceInspectRoom",
+      "text": "Search the closet",
+      "scene": "closet",
+      "conditions": [
+        {
+          "type": "OnlyOnce"
+        }
+      ]
+    },
+    {
+      "type": "ChoiceNavigate",
+      "text": "Leave room",
+      "level": "level_1",
+      "room": "entrance_hall"
+    }
+  ],
+  "scenes": {
+    "closet": {
+      "name": "Closet",
+      "opening_text": "As you open the closet a cloud of moths fly out, a few stinking leather coats hang on frail hooks. You search the pockets and eventually find a key",
+      "choices": [
+        {
+          "type": "ChoiceGoBack"
+        }
+      ],
+      "events": [
+        {
+          "type": "AddItem",
+          "item": "iron_key"
+        },
+        {
+          "type": "UnlockJournal",
+          "entry": "found_a_key"
+        }
+      ]
+    }
+  }
+}

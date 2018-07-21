@@ -1,0 +1,13 @@
+{
+  "type": "level",
+  "level_id": "level_2",
+  "level_name": "Level Two",
+  "rooms": [
+    "grande_hall",
+    "library",
+    "laboratory",
+    "dining_room",
+    "bedroom",
+    "statue_room"
+  ]
+}

@@ -3,7 +3,7 @@
   "story_name": "Cursed Dungeon",
   "starting_location": {
     "level_name": "level_1",
-    "room_name": "outside",
+    "room_name": "outside"
   },
   "starting_items": [
     "crossbow",

@@ -1,5 +1,6 @@
 {
   "type": "room",
+  "room_id": "outside",
   "room_name": "Outside",
   "opening_text": "You are a bad ass holy inquisitor, here to banish evil. You carry with you a crossbow, a holy cross, a vial of holy water and a vial of flammable oil. Other than your wits these are your only weapons. You stand before the main entrance to the cursed dungeon where evil lurks. The large wooden door before you seems old and rotten",
   "choices": [
