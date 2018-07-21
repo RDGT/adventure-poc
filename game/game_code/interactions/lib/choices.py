@@ -41,6 +41,14 @@ class Choice(object):
     def _make_choice(self, game):
         raise NotImplementedError()
 
+    def to_dict(self):
+        dict_obj = self.__dict__
+        dict_obj.pop('enabled')
+        dict_obj.pop('_times_chosen')
+        dict_obj['conditions'] = [condition.to_dict() for condition in self.conditions]
+        dict_obj['type'] = self.__class__.__name__
+        return dict_obj
+
 
 class ChoiceGoBack(Choice):
     """returns to previous screen/scene"""

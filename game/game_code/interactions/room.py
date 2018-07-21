@@ -6,7 +6,6 @@ class Room(scene.Scene):
     def __init__(self, name, opening_text, prompt=None, choices=None, scenes=None, room_flags=None, **kwargs):
         self.scenes = scenes or {}
         self.room_flags = room_flags or {}
-
         super(Room, self).__init__(name, opening_text, prompt, choices, **kwargs)
 
     def set_flag(self, flag, value):
@@ -25,3 +24,10 @@ class Room(scene.Scene):
 
     def get_first_screen(self):
         return super(Room, self).get_first_screen()
+
+    def to_dict(self):
+        dict_obj = super(Room, self).to_dict()
+        for scene_key, scene_obj in self.scenes.items():
+            dict_obj['scenes'][scene_key] = scene_obj.to_dict()
+        dict_obj['type'] = 'room'
+        return dict_obj

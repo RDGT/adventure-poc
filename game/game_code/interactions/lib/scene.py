@@ -13,8 +13,8 @@ class Screen(object):
         self.title = title
         self.text = text
         self.prompt = prompt or 'What do you do?'
-        self.choices = choices
-        self.events = events
+        self.choices = choices or []
+        self.events = events or []
         self.kwargs = kwargs
         # been seen
         self.seen = False
@@ -31,6 +31,16 @@ class Screen(object):
 
     def update_choice(self, choice):
         self.choice = choice
+
+    def to_dict(self):
+        dict_obj = self.__dict__
+        dict_obj.pop('game')
+        dict_obj.pop('seen')
+        dict_obj.pop('choice')
+        dict_obj['choices'] = [choice_obj.to_dict() for choice_obj in self.choices]
+        dict_obj['events'] = [event_obj.to_dict() for event_obj in self.events]
+        # dict_obj['type'] = self.__class__.__name__
+        return dict_obj
 
 
 class Scene(object):
@@ -78,6 +88,19 @@ class Scene(object):
         if self.current_screen == 'intro' and self.screens['intro'].seen and self.future_text:
             self.screens['intro'].text = self.future_text
         return self.screens[self.current_screen]
+
+    def to_dict(self):
+        dict_obj = self.__dict__
+        dict_obj.pop('game')
+        for screen_key, screen_obj in self.screens.items():
+            dict_obj['screens'][screen_key] = screen_obj.to_dict()
+        intro = dict_obj['screens'].pop('intro')
+        dict_obj['opening_text'] = intro['text']
+        dict_obj['prompt'] = intro['prompt']
+        dict_obj['choices'] = intro['choices']
+        dict_obj['events'] = intro['events']
+        # dict_obj['type'] = self.__class__.__name__
+        return dict_obj
 
 
 def scene_loader(path, root=None):

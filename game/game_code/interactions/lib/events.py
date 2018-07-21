@@ -38,6 +38,13 @@ class Event(object):
     def _do_event(self, game):
         raise NotImplementedError()
 
+    def to_dict(self):
+        dict_obj = self.__dict__
+        dict_obj.pop('already_triggered')
+        dict_obj['conditions'] = [condition.to_dict() for condition in self.conditions]
+        dict_obj['type'] = self.__class__.__name__
+        return dict_obj
+
 
 class AddItem(Event):
     """add an item to the inventory"""

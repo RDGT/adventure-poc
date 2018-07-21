@@ -17,6 +17,11 @@ class ChoiceCondition(object):
         """
         raise NotImplementedError()
 
+    def to_dict(self):
+        dict_obj = self.__dict__
+        dict_obj['type'] = self.__class__.__name__
+        return dict_obj
+
 
 class OnlyOnce(ChoiceCondition):
     """a condition which will disable the choice once it has been selected once"""

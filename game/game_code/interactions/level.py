@@ -30,3 +30,10 @@ class Level(area.Area):
         if item in self.rooms:
             return self.rooms[item]
         super(Level, self).__getattr__(item)
+
+    def to_dict(self):
+        dict_obj = self.__dict__
+        dict_obj.pop('game')
+        dict_obj['rooms'] = {rk: room.to_dict() for rk, room in self.rooms.items()}
+        dict_obj['type'] = 'level'
+        return dict_obj
