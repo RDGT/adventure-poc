@@ -1,9 +1,9 @@
 import json
 import os
 import asset_base
-import game.code.core.exceptions as exceptions
-import game.code.core
-from game.code import interactions
+import code.core.exceptions as exceptions
+import code.core
+from code import interactions
 import logging
 
 log = logging.getLogger('asset_loader.json')
@@ -15,7 +15,7 @@ class JsonParser(asset_base.AssetBase):
     parse_func_frmt = '_parse_{}'
 
     def load_story(self, story):
-        story_dir = os.path.join(game.code.core.assets_dir, story)
+        story_dir = os.path.join(code.core.assets_dir, story)
         self.load_dir(story_dir)
 
     def load_dir(self, directory_path):

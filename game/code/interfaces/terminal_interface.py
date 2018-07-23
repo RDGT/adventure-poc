@@ -1,5 +1,7 @@
 import abstract_interface
 import logging
+from code.core import exceptions
+from code import interactions
 
 log = logging.getLogger('interface.terminal')
 
@@ -56,7 +58,6 @@ class TerminalDecision(abstract_interface.Decision):
         return self.choice_map.keys()
 
     def set_choice(self, choice):
-        import game.code.core.exceptions as exceptions
         self.interface.display_white_space()
         choice_obj = self.choice_map.get(choice, None)
         if choice_obj is None and choice.isalpha():
@@ -82,7 +83,6 @@ class TerminalInterface(abstract_interface.Interface):
     please_select_a_choice_msg = 'please select one of the choices:'
 
     def format_choices(self, choices, add_menu_choices=True, add_menu_exit=False):
-        import game.code.interactions as interactions
         index = 1
         choice_map = {}
         choice_display_lines = []
@@ -148,7 +148,6 @@ class TerminalInterface(abstract_interface.Interface):
         return choice
 
     def do_screen(self, screen):
-        import game.code.interactions as interactions
         self.display_screen(screen)
         event_results = self.game.do_screen(screen)
         if event_results:
@@ -178,7 +177,6 @@ class TerminalInterface(abstract_interface.Interface):
         return choice
 
     def start(self):
-        import game.code.core.exceptions as exceptions
         while self.game.operating:
             try:
                 self.do_screen(self.game.get_state())

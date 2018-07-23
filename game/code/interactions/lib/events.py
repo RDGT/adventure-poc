@@ -1,4 +1,5 @@
 import logging
+from code.core import exceptions
 
 log = logging.getLogger('interactions.events')
 
@@ -91,7 +92,6 @@ class SetRoomScreen(Event):
         super(SetRoomScreen, self).__init__(**kwargs)
 
     def _do_event(self, game):
-        import game.code.core.exceptions as exceptions
         if self.level:
             if not self.room:
                 raise exceptions.GameConfigurationException(
@@ -117,7 +117,6 @@ class SetRoomFlag(Event):
         super(SetRoomFlag, self).__init__(**kwargs)
 
     def _do_event(self, game):
-        import game.code.core.exceptions as exceptions
         if self.level:
             if not self.room:
                 raise exceptions.GameConfigurationException(

@@ -1,6 +1,7 @@
 import abstract_interface
 import logging
-
+from code import interactions
+from code.core import exceptions
 log = logging.getLogger('interface.python')
 
 
@@ -22,7 +23,6 @@ class PythonDecision(abstract_interface.Decision):
         return self.choice_map.keys()
 
     def set_choice(self, choice):
-        import game.code.core.exceptions as exceptions
         choice_obj = self.choice_map.get(choice, None)
         if choice_obj is None:
             raise exceptions.GameInvalidChoice(choice)
@@ -62,7 +62,6 @@ class PythonInterface(abstract_interface.Interface):
         super(PythonInterface, self).__init__(menu_choices)
 
     def format_choices(self, choices, add_menu_choices=True, add_menu_exit=False):
-        import game.code.interactions as interactions
         index = 1
         choice_map = {}
         for choice in choices:
@@ -97,8 +96,6 @@ class PythonInterface(abstract_interface.Interface):
         return bool(self.__current_decision or self.__current_consumer_package)
 
     def get_next_screen(self):
-        import game.code.interactions as interactions
-        import game.code.core.exceptions as exceptions
         if not self.game.operating:
             if self.game.the_end is not None:
                 consumer_package = ConsumerPackage(-1, 'THE END', self.game.the_end, None, None, None)
@@ -133,7 +130,6 @@ class PythonInterface(abstract_interface.Interface):
         return self.__current_consumer_package
 
     def put_choice(self, choice):
-        import game.code.core.exceptions as exceptions
         try:
             self.__current_decision.set_choice(choice)
         except exceptions.GameInvalidChoice:

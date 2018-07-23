@@ -1,4 +1,5 @@
 import logging
+from code.core import exceptions
 
 log = logging.getLogger('interactions.choices')
 
@@ -140,7 +141,6 @@ class ChoiceNavigate(Choice):
         return 'ChoiceNavigate(level="{}" room="{}" scene="{}")'.format(self.level, self.room, self.scene)
 
     def _make_choice(self, game):
-        import game.code.core.exceptions as exceptions
         log.debug('navigating: choice={}'.format(self))
         level = game.levels.get(self.level)
         if not level:

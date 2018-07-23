@@ -1,6 +1,6 @@
-from game.code import interactions
-from game.code.interactions.lib import choices, events, conditions
-from game.code.objects import item, entry
+from code import interactions
+from code.interactions.lib import choices, events, conditions
+from code.objects import item, entry
 
 
 dining_room = interactions.room.Room(

@@ -1,3 +1,4 @@
+from code.core import exceptions
 
 
 class ChoiceCondition(object):
@@ -10,7 +11,6 @@ class ChoiceCondition(object):
         0  : condition no effect
         1  : condition enables
         :param game:
-        :param args:
         :param kwargs:
         :return:
         """
@@ -103,7 +103,6 @@ class RoomFlag(ChoiceCondition):
         super(RoomFlag, self).__init__()
 
     def check_condition(self, game, **kwargs):
-        import game.code.core.exceptions as exceptions
         if self.level:
             if not self.room:
                 raise exceptions.GameConfigurationException(

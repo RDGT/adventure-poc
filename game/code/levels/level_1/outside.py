@@ -1,6 +1,6 @@
-from game.code import interactions
-from game.code.interactions.lib import choices, events
-from game.code.objects import entry
+from code import interactions
+from code.interactions.lib import choices, events
+from code.objects import entry
 
 outside = interactions.room.Room(
     name='Outside',

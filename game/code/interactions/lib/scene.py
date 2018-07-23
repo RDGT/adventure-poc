@@ -1,4 +1,5 @@
 import os
+import code.core
 
 
 class Screen(object):
@@ -109,12 +110,11 @@ def scene_loader(path, root=None):
     :param root: the root of the dir to load, defaults to levels dir
     :return:
     """
-    import game
-    root = root or game.code.core.levels_dir
+    root = root or code.core.levels_dir
     # format names
     path_sections = path.split('.')
     scene_name = path_sections.pop(-1)
     library_path = '{}.py'.format(os.path.join(root, *path_sections))
     # load scene
-    return game.code.core.load_class_from_file(library_path, scene_name)
+    return code.core.load_class_from_file(library_path, scene_name)
 

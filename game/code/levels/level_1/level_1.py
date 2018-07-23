@@ -1,5 +1,5 @@
-from game.code.interactions import level
-from game.code.levels.level_1 import outside, closet_room, entrance_hall, kitchen, living_room
+from code.interactions import level
+from code.levels.level_1 import outside, closet_room, entrance_hall, kitchen, living_room
 
 
 level_1 = level.Level(

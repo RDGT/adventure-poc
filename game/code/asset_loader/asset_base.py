@@ -1,6 +1,6 @@
-import game.code.interactions as interactions
-import game.code.core as core
-import game.code.objects as objects
+import code.interactions as interactions
+import code.core as core
+import code.objects as objects
 from collections import namedtuple
 import logging
 

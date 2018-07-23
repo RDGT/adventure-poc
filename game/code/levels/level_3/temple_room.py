@@ -1,6 +1,6 @@
-from game.code import interactions
-from game.code.interactions.lib import choices, events, conditions, scene
-from game.code.objects import item, entry
+from code import interactions
+from code.interactions.lib import choices, events, conditions, scene
+from code.objects import item, entry
 
 temple_room = interactions.room.Room(
     name='Temple Room',

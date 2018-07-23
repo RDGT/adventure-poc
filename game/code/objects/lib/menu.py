@@ -1,3 +1,5 @@
+import code.interactions
+
 
 class Menu(object):
 
@@ -15,9 +17,8 @@ class Menu(object):
         raise NotImplementedError()
 
     def generate_menu_scene(self):
-        import game.code.interactions
         # todo: @inbar add easy navigation to menus? (by level?)
-        menu_screen = game.code.interactions.menu.Menu(
+        menu_screen = code.interactions.menu.Menu(
             name=self.name,
             menu_items=self.menu_items
         )

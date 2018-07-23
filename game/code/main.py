@@ -3,6 +3,8 @@ import logging
 import core
 import interactions
 import objects
+import interfaces
+import asset_loader
 
 
 log = logging.getLogger('game')
@@ -71,7 +73,6 @@ class Game(object):
         self.player.journal.add_entry(objects.entry.equipped)
 
     def set_terminal_interface(self):
-        import interfaces
         interface = interfaces.terminal_interface.TerminalInterface(
             menu_choices=[interactions.choices.ChoiceInventory(), interactions.choices.ChoiceJournal()],
             choice_hook=self._choice_hook
@@ -79,7 +80,6 @@ class Game(object):
         self._set_interface(interface)
 
     def set_python_interface(self):
-        import interfaces
         interface = interfaces.python_interface.PythonInterface(
             menu_choices=[interactions.choices.ChoiceInventory(), interactions.choices.ChoiceJournal()],
             # choice_hook=self._choice_hook
@@ -231,14 +231,13 @@ class Game(object):
     def load_story(self, story=None):
         if story is None:
             log.info('loading story from internal code')
-            # load levels internally from game.code
+            # load levels internally from code
             level_dirs = sorted(filter(lambda name: name.startswith('level'), os.listdir(self.level_dir)))
             for level_name in level_dirs:
                 self.load_level(level_name)
             self.set_opening_screen('level_1', 'outside')
         else:
             log.info('loading story from assets: story={}'.format(story))
-            import asset_loader
             # load levels using asset loader
             loader = asset_loader.json_parser.JsonParser()
             loader.load_story(story)

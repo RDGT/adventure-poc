@@ -1,5 +1,5 @@
-from game.code.interactions import level
-from game.code.levels.level_3 import temple_room, inner_cloister
+from code.interactions import level
+from code.levels.level_3 import temple_room, inner_cloister
 
 
 level_3 = level.Level(
