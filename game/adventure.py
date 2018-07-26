@@ -1,7 +1,7 @@
 import sys
 from optparse import OptionParser
 import logging
-import code.main
+import game_code.main
 
 log = logging.getLogger('adventure')
 
@@ -15,7 +15,7 @@ class Adventure(object):
 
     def play(self, *args):
         log.info('starting to play the Adventure game!')
-        return code.main.start_game(*args, **self.kwargs)
+        return game_code.main.start_game(*args, **self.kwargs)
 
 
 def main(args):

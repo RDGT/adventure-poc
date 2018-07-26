@@ -2,8 +2,8 @@ import sys
 from optparse import OptionParser
 import unittest
 import logging
-from code.tests import *
-import code
+from game_code.tests import *
+import game_code
 
 log = logging.getLogger('test_adventure')
 
@@ -37,7 +37,7 @@ def test_level_1_all():
 
 
 def get_interactive_tester():
-    return code.main.start_game(interface='python')
+    return game_code.main.start_game(interface='python')
 
 
 def main(args):
